@@ -1,0 +1,20 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+const records = await getCollection('components');
+---
+<BaseLayout title="Knowledge · Working Interfaces">
+  <p class="eyebrow">Canonical records</p>
+  <h1>Knowledge that can travel.</h1>
+  <p class="lead">These records are authored once and exposed to both people and machines.</p>
+  <div class="grid">
+    {records.map((record) => (
+      <article class="panel">
+        <p class="eyebrow">{record.data.kind} · {record.data.status}</p>
+        <h2>{record.data.title}</h2>
+        <p>{record.data.summary}</p>
+        <a href={`/knowledge/${record.id}/`}>Open record →</a>
+      </article>
+    ))}
+  </div>
+</BaseLayout>

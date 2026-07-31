@@ -1,0 +1,27 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const records = await getCollection('components');
+  return records.map((record) => ({ params: { id: record.id }, props: { record } }));
+}
+
+const { record } = Astro.props;
+const { Content } = await render(record);
+---
+<BaseLayout title={`${record.data.title} · Working Interfaces`} description={record.data.summary}>
+  <p class="eyebrow">Canonical {record.data.kind}</p>
+  <h1>{record.data.title}</h1>
+  <div class="meta">
+    <span class="tag">{record.data.status}</span>
+    <span class="tag">revision {record.data.revision}</span>
+    <span class="tag">{record.data.id}</span>
+  </div>
+  <p class="lead">{record.data.summary}</p>
+  <div class="actions">
+    <a class="button" href={`/api/knowledge/${record.id}.json`}>View JSON</a>
+    <a class="button button--secondary" href={`/downloads/knowledge/components/${record.id}.md`} download>Download Markdown</a>
+  </div>
+  <article class="prose"><Content /></article>
+</BaseLayout>
