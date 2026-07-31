@@ -1,96 +1,23 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { manualPages, referencePages } from '../lib/legacy-pages';
-
-const [referenceApp] = referencePages;
-
-// The register uses the same status vocabulary as the knowledge records
-// (rough, experiment, promising, reference, graduated, discarded), so a study
-// and a record can be read against the same scale.
 const experiments = [
-  {
-    id: 'EXP-01',
-    title: 'Routed legacy manual',
-    status: 'promising',
-    summary: `Astro reads the ${manualPages.length} established HTML chapters at build time and wraps their head and body in routes. Visual parity and existing interaction behavior are preserved; no chapter was rewritten.`,
-    source: 'src/components/LegacyHtmlPage.astro',
-    href: '/manual/',
-    action: 'Open the routed manual',
-  },
-  {
-    id: 'EXP-02',
-    title: 'Canonical knowledge loop',
-    status: 'experiment',
-    summary: 'One Markdown record with validated frontmatter is published as a readable page, a JSON resource, and a raw download. The record is authored once and never restated.',
-    source: 'knowledge/components/',
-    href: '/knowledge/',
-    action: 'Open the knowledge index',
-  },
-  {
-    id: 'EXP-03',
-    title: referenceApp?.title ?? 'Reference app',
-    status: 'reference',
-    summary: referenceApp?.summary ?? '',
-    source: 'public/legacy/reference/case-system-reference-app.html',
-    href: `/reference/${referenceApp?.slug ?? ''}/`,
-    action: 'Open the reference app',
-  },
-  {
-    id: 'EXP-04',
-    title: 'Raw HTML manual lane',
-    status: 'reference',
-    summary: 'The original static field manual ships unchanged and stays reachable, so any routed page can be compared against the document it came from.',
-    source: 'public/legacy/index.html',
-    href: '/legacy/',
-    action: 'Open the raw lane',
-  },
-  {
-    id: 'EXP-05',
-    title: 'Standalone prototype template',
-    status: 'rough',
-    summary: 'A duplicate-to-start HTML file for the next visual study. It stays in the repository until an experiment justifies publishing it.',
-    source: 'experiments/raw-html/_prototype-template.html',
-    href: null,
-    action: null,
-  },
+  ...manualPages.slice(0, 6).map((page) => ({ title: page.title, status: 'Astro route', href: `/manual/${page.slug}/` })),
+  ...referencePages.map((page) => ({ title: page.title, status: 'Astro route', href: `/reference/${page.slug}/` })),
+  { title: 'Legacy field manual index', status: 'Raw HTML lane', href: '/legacy/' },
 ];
-
-const published = experiments.filter((item) => item.href).length;
 ---
-<BaseLayout
-  title="Experiments · Working Interfaces"
-  description="Register of raw HTML studies and architecture experiments, with status, source, and route."
->
-  <div class="page-head">
-    <p class="eyebrow">Raw HTML prototype lane</p>
-    <h1>Make it visible before making it durable.</h1>
-    <p class="lead">
-      Every entry below is evidence, not production architecture. An experiment may stay visual,
-      be documented and left alone, or have only its proven parts extracted later.
-    </p>
-    <div class="meta">
-      <span class="tag numeric">{experiments.length} entries</span>
-      <span class="tag numeric">{published} published</span>
-      <span class="tag">status scale shared with knowledge records</span>
-    </div>
-  </div>
-
-  <ol class="records">
+<BaseLayout title="Experiments · Working Interfaces">
+  <p class="eyebrow">Raw HTML prototype lane</p>
+  <h1>Make it visible before making it durable.</h1>
+  <p class="lead">These studies remain plain HTML, CSS, and JavaScript. They are evidence, not production architecture, and the original static lane is still available for direct comparison.</p>
+  <div class="grid">
     {experiments.map((item) => (
-      <li class="record">
-        <div>
-          <p class="record__id">{item.id}</p>
-          <h2>{item.title}</h2>
-          <p class="record__summary">{item.summary}</p>
-          <p class="record__source">{item.source}</p>
-        </div>
-        <div class="record__aside">
-          <span class={`status status--${item.status}`}>{item.status}</span>
-          {item.href
-            ? <a class="arrow-link" href={item.href}>{item.action} →</a>
-            : <span class="note">In repository · not published</span>}
-        </div>
-      </li>
+      <article class="panel">
+        <p class="eyebrow">{item.status}</p>
+        <h2>{item.title}</h2>
+        <a href={item.href}>Open prototype →</a>
+      </article>
     ))}
-  </ol>
+  </div>
 </BaseLayout>

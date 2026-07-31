@@ -1,22 +1,7 @@
 ---
 import '../styles/global.css';
-
 interface Props { title: string; description?: string; }
 const { title, description = 'Working Interfaces field manual' } = Astro.props;
-
-const navigation = [
-  { href: '/manual/', label: 'Manual' },
-  { href: '/knowledge/', label: 'Knowledge' },
-  { href: '/experiments/', label: 'Experiments' },
-  { href: '/reference/case-system-reference-app/', label: 'Reference app' },
-  { href: '/legacy/', label: 'Legacy manual' },
-];
-
-// Astro is configured with trailingSlash: 'always'; normalize anyway so the
-// current section stays marked when a route is reached without one.
-const path = Astro.url.pathname.endsWith('/') ? Astro.url.pathname : `${Astro.url.pathname}/`;
-const isHome = path === '/';
-const currentSection = navigation.find((item) => path.startsWith(item.href))?.href;
 ---
 <!doctype html>
 <html lang="en">
@@ -24,30 +9,22 @@ const currentSection = navigation.find((item) => path.startsWith(item.href))?.hr
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#f0efe9" />
     <title>{title}</title>
   </head>
   <body>
-    <a class="skip-link" href="#content">Skip to content</a>
     <header class="site-header">
       <div class="site-header__inner shell">
-        <a class="brand" href="/" aria-current={isHome ? 'page' : undefined}>
-          <span class="brand__name">Working Interfaces</span>
-          <span class="brand__role">Field manual · knowledge loop</span>
-        </a>
-        <nav class="site-nav" aria-label="Primary">
-          {navigation.map((item) => (
-            <a href={item.href} aria-current={item.href === currentSection ? 'page' : undefined}>{item.label}</a>
-          ))}
+        <a class="brand" href="/">Working Interfaces</a>
+        <nav aria-label="Primary">
+          <a href="/manual/">Manual</a>
+          <a href="/knowledge/">Knowledge</a>
+          <a href="/experiments/">Experiments</a>
+          <a href="/reference/case-system-reference-app/">Reference app</a>
+          <a href="/legacy/">Legacy manual</a>
         </nav>
       </div>
     </header>
-    <main id="content" class="shell"><slot /></main>
-    <footer class="site-footer">
-      <div class="site-footer__inner shell">
-        <span>Prototype brutally. Formalize selectively. Extract only after proof.</span>
-        <span class="mono">Astro shell · raw HTML lane · canonical records</span>
-      </div>
-    </footer>
+    <main class="shell"><slot /></main>
+    <footer><div class="shell">Prototype brutally. Formalize selectively. Extract only after proof.</div></footer>
   </body>
 </html>
