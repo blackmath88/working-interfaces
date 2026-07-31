@@ -1,20 +1,72 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+
 const records = await getCollection('components');
+const sorted = [...records].sort((a, b) => a.data.title.localeCompare(b.data.title));
 ---
-<BaseLayout title="Knowledge · Working Interfaces">
-  <p class="eyebrow">Canonical records</p>
-  <h1>Knowledge that can travel.</h1>
-  <p class="lead">These records are authored once and exposed to both people and machines.</p>
-  <div class="grid">
-    {records.map((record) => (
-      <article class="panel">
-        <p class="eyebrow">{record.data.kind} · {record.data.status}</p>
-        <h2>{record.data.title}</h2>
-        <p>{record.data.summary}</p>
-        <a href={`/knowledge/${record.id}/`}>Open record →</a>
-      </article>
-    ))}
+<BaseLayout
+  title="Knowledge · Working Interfaces"
+  description="Index of canonical knowledge records, each published as a page, a JSON resource, and a raw Markdown download."
+>
+  <div class="page-head">
+    <p class="eyebrow">Canonical records</p>
+    <h1>Knowledge that can travel.</h1>
+    <p class="lead">
+      A record is one Markdown file with a validated contract: identifier, kind, status, revision,
+      and summary. It is authored once and published to people and machines from that single source.
+    </p>
+    <div class="meta">
+      <span class="tag numeric">{records.length} {records.length === 1 ? 'record' : 'records'}</span>
+      <span class="tag">collection · components</span>
+      <span class="tag">validated on build</span>
+    </div>
   </div>
+
+  <div class="planes planes--3">
+    <article class="plane">
+      <p class="eyebrow">Output 01</p>
+      <h3>Readable page</h3>
+      <p>The record rendered for review, with its status and revision stated up front.</p>
+    </article>
+    <article class="plane">
+      <p class="eyebrow">Output 02</p>
+      <h3>JSON resource</h3>
+      <p>The same record as a stable endpoint under <code>/api/knowledge/</code> for tools and agents.</p>
+    </article>
+    <article class="plane">
+      <p class="eyebrow">Output 03</p>
+      <h3>Raw Markdown</h3>
+      <p>The source file itself, downloadable for grounding without passing through a renderer.</p>
+    </article>
+  </div>
+
+  <section class="section" aria-labelledby="register">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Register</p>
+        <h2 id="register">Every record, with its state on the page.</h2>
+      </div>
+      <p>Status and revision are part of the record, not editorial framing added afterwards.</p>
+    </div>
+    <ol class="records">
+      {sorted.map((record) => (
+        <li class="record">
+          <div>
+            <p class="record__id">{record.data.id} · revision {record.data.revision}</p>
+            <h2>{record.data.title}</h2>
+            <p class="record__summary">{record.data.summary}</p>
+            {record.data.related.length > 0 && (
+              <p class="record__source">related: {record.data.related.join(', ')}</p>
+            )}
+          </div>
+          <div class="record__aside">
+            <span class="tag">{record.data.kind}</span>
+            <span class={`status status--${record.data.status}`}>{record.data.status}</span>
+            <a class="arrow-link" href={`/knowledge/${record.id}/`}>Open record →</a>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
 </BaseLayout>

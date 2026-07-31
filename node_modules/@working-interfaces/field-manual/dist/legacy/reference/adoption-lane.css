@@ -71,6 +71,7 @@ a { color: var(--color-process); }
 .button.quiet { background: transparent; }
 .button.danger { border-color: var(--danger); background: var(--danger); color: #fff; }
 .text-button { min-height: 34px; padding: 6px 8px; border-color: transparent; color: var(--muted); background: transparent; text-align: left; text-decoration: none; }
+.danger-text { color: var(--danger); }
 .mobile-menu { display: none; }
 
 .app-shell { display: grid; grid-template-columns: 286px minmax(0, 1fr); }

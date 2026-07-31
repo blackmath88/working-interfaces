@@ -1,60 +1,141 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { manualPages, referencePages } from '../lib/legacy-pages';
+
+const records = await getCollection('components');
+const [referenceApp] = referencePages;
+
+const figures = [
+  { value: String(manualPages.length), label: 'manual chapters, each routed through Astro' },
+  { value: String(referencePages.length), label: 'reference app kept as one working implementation' },
+  { value: String(records.length), label: 'canonical record published as page, JSON, and Markdown' },
+  { value: '2', label: 'lanes: raw HTML experiments and canonical knowledge' },
+];
 ---
-<BaseLayout title="Working Interfaces" description="Astro shell for the Working Interfaces field manual and knowledge records.">
-  <section class="hero-panel">
-    <div>
-      <p class="eyebrow">Field manual · architecture proof</p>
-      <h1>Interfaces for accountable work.</h1>
-      <p class="lead">
-        A fast, knowledge-first environment for prototyping serious interfaces while preserving the speed and confidence of plain HTML.
-      </p>
+<BaseLayout
+  title="Working Interfaces"
+  description="Entry point to the Case Systems field manual, the raw HTML experiment lane, and the canonical knowledge records."
+>
+  <section class="masthead">
+    <div class="masthead__lede">
+      <div>
+        <p class="eyebrow">Working Interfaces · field manual</p>
+        <h1>Interfaces for accountable work.</h1>
+        <p class="lead">
+          A knowledge-first environment for designing applications where information moves through
+          stages, evidence changes assumptions, and decisions stay inspectable. The manual behind
+          this page is the evidence; this page is the way in.
+        </p>
+      </div>
+      <div class="actions">
+        <a class="button" href="/manual/">Open the manual</a>
+        <a class="button button--secondary" href="/knowledge/">Inspect a record</a>
+        <a class="button button--secondary" href="/experiments/">See the experiment register</a>
+      </div>
     </div>
-    <div class="hero-points">
-      <div class="panel stat-card"><strong>{manualPages.length}</strong><span>manual chapters migrated into Astro routes</span></div>
-      <div class="panel stat-card"><strong>{referencePages.length}</strong><span>reference app preserved as a route</span></div>
-      <div class="panel stat-card"><strong>1</strong><span>raw HTML prototype lane kept in /legacy/</span></div>
+    <aside class="masthead__figures" aria-label="Scope of this site">
+      {figures.map((figure) => (
+        <div class="figure">
+          <b class="numeric">{figure.value}</b>
+          <span>{figure.label}</span>
+        </div>
+      ))}
+    </aside>
+  </section>
+
+  <section class="section" aria-labelledby="lanes">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">How work moves here</p>
+        <h2 id="lanes">Two lanes, one destination.</h2>
+      </div>
+      <p>Nothing is formalized before it has earned it. Both lanes stay open and neither one blocks the other.</p>
+    </div>
+    <div class="planes planes--2">
+      <article class="plane">
+        <p class="eyebrow">Lane 01 · raw HTML</p>
+        <h3>Experiments stay plain</h3>
+        <p>
+          Studies are written as plain HTML, CSS, and JavaScript. They are visual evidence, not
+          production architecture, and an experiment may remain evidence forever.
+        </p>
+        <ul>
+          <li>No build step, no component API, no test obligation.</li>
+          <li>The original static manual still ships unchanged under <code>/legacy/</code>.</li>
+          <li>Proven parts are migrated selectively; a mass rewrite is not planned.</li>
+        </ul>
+        <a class="arrow-link" href="/experiments/">Open the experiment register →</a>
+      </article>
+      <article class="plane">
+        <p class="eyebrow">Lane 02 · canonical knowledge</p>
+        <h3>Records are authored once</h3>
+        <p>
+          A record is one Markdown file with a validated frontmatter contract. It is published to
+          people and machines from that single source.
+        </p>
+        <ul>
+          <li>A readable page for review and discussion.</li>
+          <li>A JSON resource for tools and agents.</li>
+          <li>A raw Markdown download for grounding.</li>
+        </ul>
+        <a class="arrow-link" href="/knowledge/">Open the knowledge index →</a>
+      </article>
     </div>
   </section>
 
-  <div class="hero-grid">
-    <section class="panel panel--wide">
-      <p class="eyebrow">Manual</p>
-      <h2>All chapters now resolve inside Astro.</h2>
-      <p>The legacy HTML remains unchanged in `public/legacy`, but the canonical links now point at Astro routes that wrap the same page output.</p>
-      <a href="/manual/">Open the manual index →</a>
-    </section>
-    <section class="panel">
-      <p class="eyebrow">Knowledge loop</p>
-      <h2>Canonical record</h2>
-      <p>One Markdown record becomes a readable page, JSON resource, and raw download.</p>
-      <a href="/knowledge/">Inspect the first record →</a>
-    </section>
-    <section class="panel">
-      <p class="eyebrow">Reference app</p>
-      <h2>Golden implementation</h2>
-      <p>The domain-switching case shell stays intact as the primary implementation reference.</p>
-      <a href="/reference/case-system-reference-app/">Open reference app →</a>
-    </section>
-    <section class="panel">
-      <p class="eyebrow">Prototype lane</p>
-      <h2>Raw HTML still ships.</h2>
-      <p>The original static files remain available under /legacy/ for direct comparison and experiments.</p>
-      <a href="/experiments/">Browse experiments →</a>
-    </section>
-  </div>
-
-  <section class="panel panel--wide">
-    <p class="eyebrow">Migration map</p>
-    <div class="chapter-list">
+  <section class="section" aria-labelledby="manual">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">The manual</p>
+        <h2 id="manual">From visual direction to a working case system.</h2>
+      </div>
+      <p>Each chapter is a standalone interactive document. Astro wraps the established HTML at build time, so the pages keep their original appearance and behavior.</p>
+    </div>
+    <ol class="register">
       {manualPages.map((page, index) => (
-        <a class="chapter-row" href={`/manual/${page.slug}/`}>
-          <span>{String(index + 1).padStart(2, '0')}</span>
-          <strong>{page.title}</strong>
-          <em>{page.summary}</em>
-        </a>
+        <li>
+          <a class="register__link" href={`/manual/${page.slug}/`}>
+            <span class="register__index">{String(index + 1).padStart(2, '0')}</span>
+            <span class="register__title">{page.title}</span>
+            <span class="register__note">{page.summary}</span>
+            <span class="register__go" aria-hidden="true">→</span>
+          </a>
+        </li>
       ))}
+      {referenceApp && (
+        <li>
+          <a class="register__link" href={`/reference/${referenceApp.slug}/`}>
+            <span class="register__index">REF</span>
+            <span class="register__title">{referenceApp.title}</span>
+            <span class="register__note">{referenceApp.summary}</span>
+            <span class="register__go" aria-hidden="true">→</span>
+          </a>
+        </li>
+      )}
+    </ol>
+  </section>
+
+  <section class="section" aria-labelledby="entries">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Other entrances</p>
+        <h2 id="entries">The sources stay open.</h2>
+      </div>
+    </div>
+    <div class="planes planes--2">
+      <article class="plane">
+        <p class="eyebrow">Raw lane</p>
+        <h3>The static field manual</h3>
+        <p>The original entry point, its chapters, and the reference app, served exactly as written and unaffected by the Astro shell.</p>
+        <a class="arrow-link" href="/legacy/">Open /legacy/ →</a>
+      </article>
+      <article class="plane plane--sunken">
+        <p class="eyebrow">Grounding</p>
+        <h3>Sources of truth for agents</h3>
+        <p>The design doctrine, the token vocabulary, and the system model that both lanes are held against.</p>
+        <a class="arrow-link" href="/legacy/grounding/design-doctrine.md">Read the design doctrine →</a>
+      </article>
     </div>
   </section>
 </BaseLayout>

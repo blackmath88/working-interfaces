@@ -1,13 +1,12 @@
-import { DEMO_PORTFOLIO, STATIONS, validatePortfolio } from './adoption-lane-data.mjs';
+import { STATIONS } from './adoption-lane-data.mjs';
 import { parseRouteInput, routeForIds } from './adoption-lane-routing.mjs';
+import { createPortfolioRepository } from './adoption-lane-repository.mjs';
 
 const $ = selector => document.querySelector(selector);
 const page = $('#page');
 const routeError = $('#routeError');
 const panel = $('#contextPanel');
 const panelScrim = $('#panelScrim');
-const storageKey = 'adoption-lane-portfolio-v1';
-const backupKey = 'adoption-lane-portfolio-backup-v1';
 let portfolio;
 let panelOpener = null;
 let pendingConfirmation = null;
@@ -15,45 +14,10 @@ let lastRenderedPath = null;
 const expandedCustomers = new Set();
 const lastStationByUseCase = new Map();
 
-const clone = value => JSON.parse(JSON.stringify(value));
 const esc = value => String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char]));
 const slugClass = value => esc(value).replace(/\s+/g, '-');
 
-class PortfolioRepository {
-  load() {
-    try {
-      const saved = localStorage.getItem(storageKey);
-      if (!saved) return clone(DEMO_PORTFOLIO);
-      const parsed = JSON.parse(saved);
-      return validatePortfolio(parsed).length ? clone(DEMO_PORTFOLIO) : parsed;
-    } catch { return clone(DEMO_PORTFOLIO); }
-  }
-
-  replaceWithDemo() {
-    const current = localStorage.getItem(storageKey);
-    if (current) localStorage.setItem(backupKey, current);
-    const candidate = clone(DEMO_PORTFOLIO);
-    const errors = validatePortfolio(candidate);
-    if (errors.length) throw new Error(errors.join(' '));
-    localStorage.setItem(storageKey, JSON.stringify(candidate));
-    return candidate;
-  }
-
-  restore() {
-    const backup = localStorage.getItem(backupKey);
-    if (!backup) return null;
-    const candidate = JSON.parse(backup);
-    if (validatePortfolio(candidate).length) throw new Error('The saved backup is not valid.');
-    localStorage.setItem(storageKey, backup);
-    localStorage.removeItem(backupKey);
-    return candidate;
-  }
-
-  hasSavedData() { return Boolean(localStorage.getItem(storageKey)); }
-  hasBackup() { return Boolean(localStorage.getItem(backupKey)); }
-}
-
-const repository = new PortfolioRepository();
+const repository = createPortfolioRepository(localStorage);
 portfolio = repository.load();
 
 function parseRoute() {
