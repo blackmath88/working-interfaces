@@ -20,7 +20,11 @@ function escapeHtml(value: string) {
   });
 }
 
-const cleanedHead = headHtml.replace(/<title>[\s\S]*?<\/title>/i, '').trim();
+const cleanedHead = headHtml
+  .replace(/<title>[\s\S]*?<\/title>/i, '')
+  .replace(/^[\t ]+$/gm, '')
+  .replace(/\n{3,}/g, '\n\n')
+  .trim();
 const headMarkup = [
   `<title>${escapeHtml(title)}</title>`,
   description ? `<meta name="description" content="${escapeHtml(description)}">` : '',
