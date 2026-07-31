@@ -1,0 +1,237 @@
+{
+  "name": "Case Systems UI Field Manual",
+  "version": "0.1",
+  "core_objects": {
+    "Case": [
+      "identity",
+      "owner",
+      "domain",
+      "lifecycle_state",
+      "route",
+      "current_stage",
+      "next_decision"
+    ],
+    "Stage": [
+      "question",
+      "state",
+      "inputs",
+      "claims",
+      "evidence",
+      "judgments",
+      "decision",
+      "artifact"
+    ],
+    "Input": [
+      "kind",
+      "value",
+      "author",
+      "timestamp",
+      "source"
+    ],
+    "Claim": [
+      "statement",
+      "confidence",
+      "supporting_evidence",
+      "challenging_evidence"
+    ],
+    "Evidence": [
+      "type",
+      "source",
+      "verification_state",
+      "attachment"
+    ],
+    "Judgment": [
+      "dimension",
+      "value",
+      "author",
+      "timestamp",
+      "rationale"
+    ],
+    "Decision": [
+      "outcome",
+      "owner",
+      "rationale",
+      "timestamp",
+      "state_effects"
+    ],
+    "Stakeholder": [
+      "role",
+      "influence",
+      "impact",
+      "ownership"
+    ],
+    "Risk": [
+      "condition",
+      "severity",
+      "owner",
+      "blocking_effect"
+    ],
+    "Artifact": [
+      "type",
+      "content",
+      "source_links",
+      "status"
+    ],
+    "ProvenanceReference": [
+      "source_stage",
+      "source_object",
+      "author",
+      "timestamp",
+      "original_value"
+    ],
+    "Supersession": [
+      "previous_record",
+      "current_record",
+      "reason",
+      "timestamp"
+    ]
+  },
+  "relationships": [
+    [
+      "Case",
+      "contains",
+      "Stage"
+    ],
+    [
+      "Stage",
+      "captures",
+      "Input"
+    ],
+    [
+      "Evidence",
+      "supports_or_challenges",
+      "Claim"
+    ],
+    [
+      "Judgment",
+      "informs",
+      "Decision"
+    ],
+    [
+      "Decision",
+      "changes_state_of",
+      "Case"
+    ],
+    [
+      "Decision",
+      "completes_or_blocks",
+      "Stage"
+    ],
+    [
+      "Stakeholder",
+      "owns",
+      "Decision"
+    ],
+    [
+      "Risk",
+      "blocks",
+      "Stage"
+    ],
+    [
+      "Artifact",
+      "documents",
+      "Case"
+    ],
+    [
+      "Artifact",
+      "references",
+      "Evidence"
+    ],
+    [
+      "Input",
+      "may_carry_to",
+      "Stage"
+    ],
+    [
+      "CurrentRecord",
+      "supersedes",
+      "PreviousRecord"
+    ]
+  ],
+  "case_states": [
+    "Draft",
+    "Active",
+    "Waiting",
+    "Blocked",
+    "Ready for decision",
+    "Concluded",
+    "No-Go",
+    "Archived",
+    "Reopened"
+  ],
+  "stage_states": [
+    "Not started",
+    "In progress",
+    "Incomplete",
+    "Ready",
+    "Completed",
+    "Skipped",
+    "Blocked",
+    "Superseded"
+  ],
+  "content_origins": [
+    "User-authored",
+    "Imported",
+    "Inherited",
+    "Computed",
+    "AI-suggested",
+    "Validated",
+    "Superseded"
+  ],
+  "component_families": [
+    "case shell",
+    "structured inputs",
+    "money and value",
+    "analytical instruments",
+    "evidence",
+    "stakeholders",
+    "decision journal",
+    "provenance",
+    "supersession",
+    "state feedback",
+    "process diagrams",
+    "readable artifacts"
+  ],
+  "page_patterns": [
+    "application home",
+    "portfolio",
+    "case overview",
+    "stage workspace",
+    "workspace with inspector",
+    "evidence review",
+    "decision review",
+    "final dossier",
+    "mobile case",
+    "marketing hero"
+  ],
+  "domain_extensions": {
+    "project": [
+      "deliverables",
+      "dependencies",
+      "milestones",
+      "readiness",
+      "risks"
+    ],
+    "change": [
+      "stakeholder impact",
+      "target behavior",
+      "readiness",
+      "interventions",
+      "adoption evidence"
+    ],
+    "consulting": [
+      "problem framing",
+      "hypotheses",
+      "evidence",
+      "recommendation",
+      "client decision"
+    ],
+    "adoption_lane": [
+      "nine stations",
+      "route gates",
+      "tracks",
+      "organizational lens",
+      "method laws"
+    ]
+  }
+}

@@ -1,0 +1,93 @@
+<!DOCTYPE html><html lang="en"> <head><title>Content + UX Writing System</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#101216"><style>
+:root{--bg:#f3f2ee;--paper:#fbfaf7;--paper2:#ebe9e3;--ink:#17191d;--muted:#71767d;--line:#d5d2ca;--accent:#6259e8;--soft:#e9e6ff;--good:#177a5b;--warn:#9b6806;--bad:#b44036;--info:#2f67a9;--shadow:0 18px 55px rgba(20,22,26,.08);--radius:14px;--sans:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--serif:Georgia,'Times New Roman',serif;--mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace}
+[data-theme='dark']{--bg:#0d0f12;--paper:#14171c;--paper2:#1c2026;--ink:#f3f4f6;--muted:#9aa1ac;--line:#2a3038;--accent:#8d85ff;--soft:#272346;--good:#63c9a7;--warn:#e2ba5e;--bad:#ff8177;--info:#76a8e5;--shadow:0 20px 70px rgba(0,0,0,.38)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.45}button,input,textarea,select{font:inherit;color:inherit}button{cursor:pointer}
+.top{position:sticky;top:0;z-index:30;height:58px;display:flex;align-items:center;gap:10px;padding:0 14px;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--bg),transparent 7%);backdrop-filter:blur(18px)}.logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(145deg,var(--accent),#d9705b)}.brand b{display:block}.brand small{display:block;color:var(--muted);font-size:10px}.spacer{flex:1}.btn,.iconbtn,.tab{border:1px solid var(--line);background:var(--paper);border-radius:10px;min-height:36px;padding:0 12px}.iconbtn{width:38px;padding:0}.btn.primary,.tab.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.shell{display:grid;grid-template-columns:230px minmax(0,1fr)}.side{position:sticky;top:58px;height:calc(100vh - 58px);overflow:auto;padding:14px;border-right:1px solid var(--line)}.navlabel{font:600 10px var(--mono);text-transform:uppercase;letter-spacing:.12em;color:var(--muted);padding:8px 9px}.nav a{display:flex;padding:9px;border-radius:9px;color:var(--muted);text-decoration:none}.nav a:hover{background:var(--paper2);color:var(--ink)}
+main{min-width:0;max-width:1500px;width:100%;margin:auto;padding:clamp(16px,3vw,34px)}.hero{display:grid;grid-template-columns:1.35fr .65fr;gap:14px}.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}.hero-main{padding:clamp(24px,5vw,52px);min-height:340px;display:flex;flex-direction:column;justify-content:space-between}.hero-side{padding:18px;display:grid;gap:10px;background:linear-gradient(160deg,var(--paper),color-mix(in srgb,var(--soft),var(--paper) 68%))}.stat{border:1px solid var(--line);padding:14px;border-radius:10px}.stat b{display:block;font-size:24px}.stat small{color:var(--muted)}
+.eyebrow{font:600 10px var(--mono);text-transform:uppercase;letter-spacing:.13em;color:var(--accent)}h1{font-size:clamp(38px,7vw,76px);line-height:.95;letter-spacing:-.055em;margin:18px 0}h2{font-size:clamp(24px,4vw,38px);letter-spacing:-.04em;margin:0}h3{font-size:18px;letter-spacing:-.025em;margin:0 0 8px}p{color:var(--muted)}
+.section{margin-top:34px;scroll-margin-top:80px}.sectionhead{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:12px}.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px}.s3{grid-column:span 3}.s4{grid-column:span 4}.s5{grid-column:span 5}.s6{grid-column:span 6}.s7{grid-column:span 7}.s8{grid-column:span 8}.s9{grid-column:span 9}.s12{grid-column:span 12}.pad{padding:18px}.chip{display:inline-flex;border:1px solid var(--line);background:var(--paper2);border-radius:999px;padding:5px 8px;font-size:10px;color:var(--muted)}.controls{display:flex;gap:7px;flex-wrap:wrap}.code{background:#0d1015;color:#d8dbe1;border-radius:12px;padding:15px;white-space:pre-wrap;font:12px/1.55 var(--mono);overflow:auto}.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,15px);opacity:0;background:var(--ink);color:var(--bg);padding:9px 13px;border-radius:9px;transition:.2s;z-index:50}.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:900px){.shell{display:block}.side{display:none}main{padding:14px 12px 78px}.hero{grid-template-columns:1fr}.hero-side{grid-template-columns:repeat(3,1fr)}.s3,.s4,.s5,.s6,.s7,.s8,.s9{grid-column:span 12}}
+@media(max-width:540px){.brand small{display:none}.top .btn{display:none}.hero-side{grid-template-columns:1fr 1fr}.hero-side .stat:last-child{grid-column:1/-1}.sectionhead{align-items:flex-start;flex-direction:column}}
+
+.pair{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);margin-top:12px}.pair>div{padding:14px}.pair>div+div{border-left:1px solid var(--line)}.badcopy{background:color-mix(in srgb,var(--bad),transparent 90%)}.goodcopy{background:color-mix(in srgb,var(--good),transparent 92%)}.label{font:600 10px var(--mono);letter-spacing:.08em;color:var(--muted)}.generator{display:grid;grid-template-columns:280px 1fr;gap:14px}.field{margin-top:12px}.field label{display:block;font:600 10px var(--mono);color:var(--muted);margin-bottom:6px}.field select,.field input,.field textarea{width:100%;border:1px solid var(--line);background:var(--paper);padding:10px;border-radius:9px}.preview{padding:20px;background:var(--paper2)}.message{border:1px solid var(--line);padding:16px;background:var(--paper);margin-top:12px}.taxonomy{display:grid;grid-template-columns:130px 1fr;padding:10px 0;border-top:1px solid var(--line)}.taxonomy:first-child{border-top:0}.taxonomy code{font-family:var(--mono);color:var(--accent)}@media(max-width:900px){.generator{grid-template-columns:1fr}}@media(max-width:540px){.pair{grid-template-columns:1fr}.pair>div+div{border-left:0;border-top:1px solid var(--line)}}
+</style></head> <body><header class="top"><div class="logo"></div><div class="brand"><b>Content + UX Writing System</b><small>Case Systems · language</small></div><div class="spacer"></div><button class="btn" onclick="copySpec()">Copy agent brief</button><button class="iconbtn" onclick="toggleTheme()">◐</button></header>
+<div class="shell"><aside class="side"><div class="navlabel">Sections</div><nav class="nav"><a href="#generator">Message generator</a><a href="#patterns">Before and after</a><a href="#taxonomy">Origin language</a></nav></aside><main>
+<section class="hero"><article class="card hero-main"><div><div class="eyebrow">Content and UX-writing system</div><h1>Language should reveal<br>what the system knows.</h1><p style="font-size:18px;max-width:700px">The interface must distinguish user-authored, inherited, computed, AI-suggested, validated, and superseded information—and explain actions without generic SaaS language.</p></div></article><aside class="card hero-side"><div class="stat"><b>7</b><small>content origins</small></div><div class="stat"><b>9</b><small>message families</small></div><div class="stat"><b>1</b><small>shared voice</small></div></aside></section>
+<section class="section" id="generator"><div class="sectionhead"><div><div class="eyebrow">01 · Message generator</div><h2>Compose precise system language</h2></div></div><div class="generator"><aside class="card pad">
+<div class="field"><label>MESSAGE TYPE</label><select id="type" onchange="renderCopy()"><option>Validation</option><option>Empty state</option><option>Decision</option><option>Provenance</option><option>AI suggestion</option><option>Blocked</option></select></div>
+<div class="field"><label>SUBJECT</label><input id="subject" value="decision owner" oninput="renderCopy()"></div>
+<div class="field"><label>CONSEQUENCE</label><input id="consequence" value="the decision cannot be recorded" oninput="renderCopy()"></div>
+<div class="field"><label>NEXT ACTION</label><input id="action" value="Assign an accountable owner" oninput="renderCopy()"></div></aside>
+<article class="card preview"><div class="label">LIVE COPY</div><div class="message"><h3 id="messageTitle"></h3><p id="messageBody"></p><button class="btn primary" id="messageAction"></button></div></article></div></section>
+<section class="section" id="patterns"><div class="sectionhead"><div><div class="eyebrow">02 · Before and after</div><h2>Replace generic product language</h2></div></div><div class="grid">
+<article class="card s6 pad"><div class="pair"><div class="badcopy"><div class="label">WEAK</div><h3>Something went wrong</h3><p>Please try again.</p></div><div class="goodcopy"><div class="label">SPECIFIC</div><h3>The decision was not saved</h3><p>Your local changes are still available. Reconnect and save again.</p></div></div></article>
+<article class="card s6 pad"><div class="pair"><div class="badcopy"><div class="label">WEAK</div><h3>No data</h3><p>Add something to continue.</p></div><div class="goodcopy"><div class="label">SPECIFIC</div><h3>No evidence has been attached</h3><p>Add a document, interview, observation, or measurement before recording the decision.</p></div></div></article>
+<article class="card s6 pad"><div class="pair"><div class="badcopy"><div class="label">WEAK</div><h3>AI recommendation</h3><p>Proceed with the project.</p></div><div class="goodcopy"><div class="label">SPECIFIC</div><h3>Suggested from current evidence</h3><p>Proceed to prototype validation. This suggestion has not been accepted by a consultant.</p></div></div></article>
+<article class="card s6 pad"><div class="pair"><div class="badcopy"><div class="label">WEAK</div><h3>Cancel</h3><p>Are you sure?</p></div><div class="goodcopy"><div class="label">SPECIFIC</div><h3>Conclude this case as No-Go</h3><p>The case remains readable and can be reopened later.</p></div></div></article>
+</div></section>
+<section class="section" id="taxonomy"><div class="sectionhead"><div><div class="eyebrow">03 · Content provenance language</div><h2>Name the origin</h2></div></div><article class="card pad">
+<div class="taxonomy"><code>User-authored</code><span>Written directly by the consultant.</span></div><div class="taxonomy"><code>Imported</code><span>Received from an external system or file.</span></div><div class="taxonomy"><code>Inherited</code><span>Carried from an earlier stage with source attached.</span></div><div class="taxonomy"><code>Computed</code><span>Calculated from explicit inputs and formula.</span></div><div class="taxonomy"><code>AI-suggested</code><span>Generated proposal awaiting human acceptance.</span></div><div class="taxonomy"><code>Validated</code><span>Reviewed and confirmed against evidence.</span></div><div class="taxonomy"><code>Superseded</code><span>Preserved earlier value replaced by a later one.</span></div>
+</article></section>
+<section class="section"><div class="sectionhead"><div><div class="eyebrow">04 · Agent handoff</div><h2>Content-system brief</h2></div></div><div class="code" id="spec">Write interface copy for a case-management product.
+
+VOICE
+- precise
+- calm
+- non-promotional
+- evidence-aware
+- neutral about Proceed and No-Go
+- explicit about consequences
+
+DISTINGUISH
+User-authored, Imported, Inherited, Computed, AI-suggested, Validated, Superseded.
+
+MESSAGE RULES
+- Name the object or action that failed.
+- State whether user work was preserved.
+- Explain why the condition matters.
+- Give one concrete next action.
+- Do not use generic phrases such as “Something went wrong,” “No data,” or “Are you sure?”
+- AI suggestions must say they are suggestions and whether a human accepted them.
+- No-Go copy must describe closure as a legitimate outcome.
+- Provenance labels should name source stage, author, and date where useful.</div></section>
+</main></div><div class="toast" id="toast"></div>
+<script>
+function toggleTheme(){document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark';localStorage.setItem('case-theme',document.documentElement.dataset.theme)}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1300)}
+async function copySpec(){try{await navigator.clipboard.writeText(document.getElementById('spec').innerText);toast('Agent brief copied')}catch(e){toast('Copy unavailable')}}
+document.documentElement.dataset.theme=localStorage.getItem('case-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+
+function renderCopy(){
+ const t=type.value,s=subject.value,c=consequence.value,a=action.value;
+ const map={
+ Validation:[`Assign a ${s}`,`Without it, ${c}.`,a],
+ 'Empty state':[`No ${s} has been added`,`The case can remain open, but ${c}.`,a],
+ Decision:[`Record the decision`,`The decision becomes part of the permanent case history.`,a],
+ Provenance:[`Inherited from an earlier stage`,`This value keeps its source, author, and original wording.`,`View source`],
+ 'AI suggestion':[`Suggested from current evidence`,`This has not been accepted by a consultant.`,`Review suggestion`],
+ Blocked:[`Case blocked by ${s}`,`Until this is resolved, ${c}.`,a]
+ };
+ const m=map[t];messageTitle.textContent=m[0];messageBody.textContent=m[1];messageAction.textContent=m[2];
+}
+renderCopy();
+
+</script>
+<a href="../index.html" class="field-manual-return" aria-label="Return to Case Systems Field Manual">
+  <span>←</span> Field Manual
+</a>
+<style>
+.field-manual-return{
+ position:fixed;right:14px;bottom:14px;z-index:9999;
+ display:inline-flex;align-items:center;gap:7px;
+ padding:9px 12px;border:1px solid rgba(127,127,127,.35);
+ border-radius:10px;background:rgba(20,22,26,.92);color:#fff;
+ font:600 11px/1.2 ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+ text-decoration:none;box-shadow:0 10px 30px rgba(0,0,0,.18);
+ backdrop-filter:blur(12px)
+}
+.field-manual-return:hover{transform:translateY(-1px)}
+</style>
+
+</body></html>

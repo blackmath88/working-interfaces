@@ -1,0 +1,80 @@
+<!DOCTYPE html><html lang="en"> <head><title>Interaction + Behavior Library</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#101216"><style>
+:root{--bg:#f3f2ee;--paper:#fbfaf7;--paper2:#ebe9e3;--ink:#17191d;--muted:#71767d;--line:#d5d2ca;--accent:#6259e8;--soft:#e9e6ff;--good:#177a5b;--warn:#9b6806;--bad:#b44036;--shadow:0 18px 55px rgba(20,22,26,.08);--radius:14px;--sans:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--serif:Georgia,'Times New Roman',serif;--mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace}
+[data-theme='dark']{--bg:#0d0f12;--paper:#14171c;--paper2:#1c2026;--ink:#f3f4f6;--muted:#9aa1ac;--line:#2a3038;--accent:#8d85ff;--soft:#272346;--good:#63c9a7;--warn:#e2ba5e;--bad:#ff8177;--shadow:0 20px 70px rgba(0,0,0,.38)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.45}button,input,textarea,select{font:inherit;color:inherit}button{cursor:pointer}
+.top{position:sticky;top:0;z-index:30;height:58px;display:flex;align-items:center;gap:10px;padding:0 14px;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--bg),transparent 7%);backdrop-filter:blur(18px)}.logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(145deg,var(--accent),#d9705b)}.brand b{display:block}.brand small{display:block;color:var(--muted);font-size:10px}.spacer{flex:1}.btn,.iconbtn,.tab{border:1px solid var(--line);background:var(--paper);border-radius:10px;min-height:36px;padding:0 12px}.iconbtn{width:38px;padding:0}.btn.primary,.tab.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.shell{display:grid;grid-template-columns:230px minmax(0,1fr)}.side{position:sticky;top:58px;height:calc(100vh - 58px);overflow:auto;padding:14px;border-right:1px solid var(--line)}.navlabel{font:600 10px var(--mono);text-transform:uppercase;letter-spacing:.12em;color:var(--muted);padding:8px 9px}.nav a{display:flex;padding:9px;border-radius:9px;color:var(--muted);text-decoration:none}.nav a:hover{background:var(--paper2);color:var(--ink)}
+main{min-width:0;max-width:1500px;width:100%;margin:auto;padding:clamp(16px,3vw,34px)}.hero{display:grid;grid-template-columns:1.35fr .65fr;gap:14px}.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}.hero-main{padding:clamp(24px,5vw,52px);min-height:340px;display:flex;flex-direction:column;justify-content:space-between}.hero-side{padding:18px;display:grid;gap:10px;background:linear-gradient(160deg,var(--paper),color-mix(in srgb,var(--soft),var(--paper) 68%))}.stat{border:1px solid var(--line);padding:14px;border-radius:10px}.stat b{display:block;font-size:24px}.stat small{color:var(--muted)}
+.eyebrow{font:600 10px var(--mono);text-transform:uppercase;letter-spacing:.13em;color:var(--accent)}h1{font-size:clamp(38px,7vw,76px);line-height:.95;letter-spacing:-.055em;margin:18px 0}h2{font-size:clamp(24px,4vw,38px);letter-spacing:-.04em;margin:0}h3{font-size:18px;letter-spacing:-.025em;margin:0 0 8px}p{color:var(--muted)}
+.section{margin-top:34px;scroll-margin-top:80px}.sectionhead{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:12px}.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px}.s3{grid-column:span 3}.s4{grid-column:span 4}.s5{grid-column:span 5}.s6{grid-column:span 6}.s7{grid-column:span 7}.s8{grid-column:span 8}.s9{grid-column:span 9}.s12{grid-column:span 12}.pad{padding:18px}.chip{display:inline-flex;border:1px solid var(--line);background:var(--paper2);border-radius:999px;padding:5px 8px;font-size:10px;color:var(--muted)}.controls{display:flex;gap:7px;flex-wrap:wrap}.code{background:#0d1015;color:#d8dbe1;border-radius:12px;padding:15px;white-space:pre-wrap;font:12px/1.55 var(--mono);overflow:auto}.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,15px);opacity:0;background:var(--ink);color:var(--bg);padding:9px 13px;border-radius:9px;transition:.2s;z-index:50}.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:900px){.shell{display:block}.side{display:none}main{padding:14px 12px 78px}.hero{grid-template-columns:1fr}.hero-side{grid-template-columns:repeat(3,1fr)}.s3,.s4,.s5,.s6,.s7,.s8,.s9{grid-column:span 12}}
+@media(max-width:540px){.brand small{display:none}.top .btn{display:none}.hero-side{grid-template-columns:1fr 1fr}.hero-side .stat:last-child{grid-column:1/-1}.sectionhead{align-items:flex-start;flex-direction:column}}
+
+.sim{display:grid;grid-template-columns:300px 1fr;gap:14px}.actionlist button{width:100%;text-align:left;margin-top:8px}.case{padding:18px}.statusbar{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding-bottom:12px}.log{margin-top:14px;border-left:2px solid var(--line);padding-left:16px}.event{position:relative;padding:0 0 14px}.event:before{content:'';position:absolute;left:-22px;top:3px;width:9px;height:9px;border-radius:50%;background:var(--paper);border:2px solid var(--ink)}.event small{font:600 10px var(--mono);color:var(--muted)}.dirty{color:var(--warn)}.locked{opacity:.55}.banner{padding:11px 12px;border-left:4px solid var(--accent);background:var(--soft);margin-top:12px}.rule{display:grid;grid-template-columns:120px 1fr;padding:10px 0;border-top:1px solid var(--line)}.rule:first-child{border-top:0}.kbd{font-family:var(--mono);border:1px solid var(--line);background:var(--paper2);padding:2px 5px;border-radius:5px}@media(max-width:900px){.sim{grid-template-columns:1fr}}
+</style></head> <body><header class="top"><div class="logo"></div><div class="brand"><b>Interaction + Behavior Library</b><small>Case Systems · behavior</small></div><div class="spacer"></div><button class="btn" onclick="copySpec()">Copy agent brief</button><button class="iconbtn" onclick="toggleTheme()">◐</button></header>
+<div class="shell"><aside class="side"><div class="navlabel">Sections</div><nav class="nav"><a href="#simulator">Live simulator</a><a href="#rules">Behavioral contracts</a></nav></aside><main>
+<section class="hero"><article class="card hero-main"><div><div class="eyebrow">Interaction and behavior library</div><h1>What the product<br>promises when acted on.</h1><p style="font-size:18px;max-width:700px">Create, save, supersede, conclude, reopen, skip, and carry forward are not button styles. They are contracts with consequences.</p></div></article><aside class="card hero-side"><div class="stat"><b>10</b><small>case actions</small></div><div class="stat"><b>6</b><small>system side effects</small></div><div class="stat"><b>1</b><small>append-only log</small></div></aside></section>
+<section class="section" id="simulator"><div class="sectionhead"><div><div class="eyebrow">01 · Live behavior simulator</div><h2>Act on the case</h2></div></div><div class="sim">
+<aside class="card pad actionlist"><button class="btn" onclick="act('edit')">Edit field</button><button class="btn" onclick="act('save')">Save</button><button class="btn" onclick="act('supersede')">Supersede value</button><button class="btn" onclick="act('carry')">Carry forward</button><button class="btn" onclick="act('skip')">Skip stage with reason</button><button class="btn" onclick="act('conclude')">Conclude case</button><button class="btn" onclick="act('reopen')">Reopen case</button><button class="btn" onclick="act('error')">Simulate save failure</button></aside>
+<article class="card case" id="casePane"><div class="statusbar"><div><div class="eyebrow">CASE · CONS-024</div><h3>Service-contract intelligence</h3></div><div><span class="chip" id="stateChip">Active</span><div id="saveState" class="meta">Saved</div></div></div>
+<div class="banner" id="banner">Current stage: Evidence review · Next decision: Proceed or conclude?</div>
+<div class="field" style="margin-top:14px"><label style="font:600 10px var(--mono);color:var(--muted)">EXPECTED VALUE</label><input id="valueField" value="CHF 180k / year" style="width:100%;border:1px solid var(--line);background:var(--paper);padding:11px;border-radius:9px"></div>
+<div class="log" id="log"><div class="event"><small>26 MAR · SYSTEM</small><p>Case opened in evidence review.</p></div></div></article></div></section>
+<section class="section" id="rules"><div class="sectionhead"><div><div class="eyebrow">02 · Behavioral contracts</div><h2>Rules behind the controls</h2></div></div><div class="grid"><article class="card s6 pad">
+<div class="rule"><b>Autosave</b><span>Show dirty, saving, saved, and failed states without blocking work.</span></div>
+<div class="rule"><b>Supersede</b><span>Create a new value and preserve the old one with author, time, and reason.</span></div>
+<div class="rule"><b>Carry forward</b><span>Attach provenance and keep original wording available.</span></div>
+<div class="rule"><b>Skip</b><span>Require a reason and keep the stage visible in the route.</span></div>
+<div class="rule"><b>Conclude</b><span>Lock normal editing but preserve reading, export, and reopen.</span></div>
+</article><article class="card s6 pad"><div class="rule"><b>Undo</b><span>Prefer reversible actions over confirmation dialogs.</span></div><div class="rule"><b>Validation</b><span>Explain what is missing and why the decision cannot yet be recorded.</span></div><div class="rule"><b>Keyboard</b><span><span class="kbd">⌘ K</span> search, <span class="kbd">⌘ S</span> save, arrow navigation where ordered.</span></div><div class="rule"><b>Offline</b><span>Keep local edits visible and identify what has not synchronized.</span></div><div class="rule"><b>Conflict</b><span>Show competing versions and ask for an explicit resolution.</span></div></article></div></section>
+<section class="section"><div class="sectionhead"><div><div class="eyebrow">03 · Agent handoff</div><h2>Behavior brief</h2></div></div><div class="code" id="spec">Implement behavior as explicit product contracts.
+- Edit: mark the case dirty without losing the last saved state.
+- Save: show saving, saved, and failed states.
+- Supersede: append a new value; preserve the old value, author, date, and rationale.
+- Carry forward: attach source stage and original wording.
+- Skip: require a reason; keep the stage visible and marked skipped.
+- Conclude: lock normal editing, preserve export and reopen.
+- Reopen: append a reopening event and restore controlled editing.
+- Prefer undo over modal confirmation for reversible actions.
+- Validation messages must state what is missing and why it matters.
+- All meaningful actions append an audit-log event.</div></section>
+</main></div><div class="toast" id="toast"></div>
+<script>
+function toggleTheme(){document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark';localStorage.setItem('case-theme',document.documentElement.dataset.theme)}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1300)}
+async function copySpec(){try{await navigator.clipboard.writeText(document.getElementById('spec').innerText);toast('Agent brief copied')}catch(e){toast('Copy unavailable')}}
+document.documentElement.dataset.theme=localStorage.getItem('case-theme')||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+
+let dirty=false,closed=false;
+function addLog(text){const d=document.createElement('div');d.className='event';d.innerHTML=`<small>${new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})} · USER</small><p>${text}</p>`;document.getElementById('log').prepend(d)}
+function act(a){
+ const field=document.getElementById('valueField'),save=document.getElementById('saveState'),chip=document.getElementById('stateChip'),banner=document.getElementById('banner'),pane=document.getElementById('casePane');
+ if(a==='edit'){if(closed){toast('Reopen the case first');return}field.focus();dirty=true;save.textContent='Unsaved changes';save.className='meta dirty';addLog('Value field entered edit mode.')}
+ if(a==='save'){if(closed)return;save.textContent='Saving…';setTimeout(()=>{save.textContent='Saved';save.className='meta';dirty=false;addLog('Changes saved.')},500)}
+ if(a==='supersede'){if(closed)return;field.value='CHF 165k / year';addLog('Expected value superseded. Earlier value preserved in history.');banner.textContent='Current value revised after new evidence.'}
+ if(a==='carry'){addLog('Value carried to Decision stage with provenance from Evidence review.');banner.textContent='Carried field now shows source stage and original wording.'}
+ if(a==='skip'){addLog('Stage skipped. Reason: evidence unavailable within decision window.');banner.textContent='Stage skipped with recorded reason.'}
+ if(a==='conclude'){closed=true;chip.textContent='Concluded';pane.classList.add('locked');field.disabled=true;addLog('Case concluded. Editing locked.')}
+ if(a==='reopen'){closed=false;chip.textContent='Active';pane.classList.remove('locked');field.disabled=false;addLog('Case reopened for controlled editing.')}
+ if(a==='error'){save.textContent='Save failed';save.className='meta dirty';addLog('Save failed. Local changes retained.');toast('Local changes retained')}
+}
+
+</script>
+<a href="../index.html" class="field-manual-return" aria-label="Return to Case Systems Field Manual">
+  <span>←</span> Field Manual
+</a>
+<style>
+.field-manual-return{
+ position:fixed;right:14px;bottom:14px;z-index:9999;
+ display:inline-flex;align-items:center;gap:7px;
+ padding:9px 12px;border:1px solid rgba(127,127,127,.35);
+ border-radius:10px;background:rgba(20,22,26,.92);color:#fff;
+ font:600 11px/1.2 ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+ text-decoration:none;box-shadow:0 10px 30px rgba(0,0,0,.18);
+ backdrop-filter:blur(12px)
+}
+.field-manual-return:hover{transform:translateY(-1px)}
+</style>
+
+</body></html>

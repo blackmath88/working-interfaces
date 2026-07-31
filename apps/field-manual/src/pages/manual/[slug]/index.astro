@@ -1,4 +1,5 @@
 ---
+import { join } from 'node:path';
 import { readFileSync } from 'node:fs';
 import { manualPages } from '../../../lib/legacy-pages';
 import LegacyHtmlPage from '../../../components/LegacyHtmlPage.astro';
@@ -8,7 +9,7 @@ export async function getStaticPaths() {
 }
 
 const { page } = Astro.props;
-const source = readFileSync(new URL(`../../../../public/legacy/${page.source}`, import.meta.url), 'utf8');
+const source = readFileSync(join(process.cwd(), 'public', 'legacy', page.source), 'utf8');
 const headMatch = source.match(/<head[^>]*>([\s\S]*?)<\/head>/i);
 const bodyMatch = source.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
 const titleMatch = source.match(/<title>([\s\S]*?)<\/title>/i);

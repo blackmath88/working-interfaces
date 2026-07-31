@@ -1,0 +1,24 @@
+id: adoption-lane
+status: concept
+revision: 1
+extends: working-interfaces-core
+
+vocabulary:
+  stage: station
+  process: lane
+
+requiredModules:
+  - visible-route
+  - decision-journal
+  - organizational-reflection
+
+constraints:
+  stageOrder: fixed
+  skippedStagesRemainVisible: true
+  noGoIsFirstClassOutcome: true
+  provenanceDisplay: required
+
+visualDefaults:
+  composition: route-first
+  density: compact
+  routeStyle: transit-instrument
