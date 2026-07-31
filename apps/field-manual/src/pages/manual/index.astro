@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { manualPages } from '../../lib/legacy-pages';
+---
+<BaseLayout title="Manual · Working Interfaces" description="Astro routes for the full Case Systems field manual.">
+  <p class="eyebrow">Astro manual routes</p>
+  <h1>Every chapter now has a route.</h1>
+  <p class="lead">The legacy HTML remains available under <a href="/legacy/">/legacy/</a> as the raw prototype lane. These Astro routes preserve the page output while centralizing navigation.</p>
+
+  <div class="hero-grid">
+    {manualPages.map((page, index) => (
+      <article class="panel chapter-card">
+        <p class="eyebrow">Chapter {String(index + 1).padStart(2, '0')}</p>
+        <h2>{page.title}</h2>
+        <p>{page.summary}</p>
+        <a href={`/manual/${page.slug}/`}>Open chapter →</a>
+      </article>
+    ))}
+  </div>
+</BaseLayout>

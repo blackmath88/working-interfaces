@@ -7,7 +7,7 @@ const { title, description = 'Working Interfaces field manual' } = Astro.props;
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
     <meta name="description" content={description} />
     <title>{title}</title>
   </head>
@@ -16,8 +16,10 @@ const { title, description = 'Working Interfaces field manual' } = Astro.props;
       <div class="site-header__inner shell">
         <a class="brand" href="/">Working Interfaces</a>
         <nav aria-label="Primary">
+          <a href="/manual/">Manual</a>
           <a href="/knowledge/">Knowledge</a>
           <a href="/experiments/">Experiments</a>
+          <a href="/reference/case-system-reference-app/">Reference app</a>
           <a href="/legacy/">Legacy manual</a>
         </nav>
       </div>

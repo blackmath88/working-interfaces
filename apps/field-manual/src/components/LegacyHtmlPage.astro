@@ -1,0 +1,34 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+  headHtml: string;
+  bodyHtml: string;
+}
+
+const { title, description, headHtml, bodyHtml } = Astro.props;
+
+function escapeHtml(value: string) {
+  return value.replace(/[&<>"]/g, (character) => {
+    switch (character) {
+      case '&': return '&amp;';
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '"': return '&quot;';
+      default: return character;
+    }
+  });
+}
+
+const cleanedHead = headHtml.replace(/<title>[\s\S]*?<\/title>/i, '').trim();
+const headMarkup = [
+  `<title>${escapeHtml(title)}</title>`,
+  description ? `<meta name="description" content="${escapeHtml(description)}">` : '',
+  cleanedHead,
+].filter(Boolean).join('\n');
+---
+<!doctype html>
+<html lang="en">
+  <head set:html={headMarkup}></head>
+  <body set:html={bodyHtml}></body>
+</html>

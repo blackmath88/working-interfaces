@@ -1,28 +1,60 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { manualPages, referencePages } from '../lib/legacy-pages';
 ---
-<BaseLayout title="Working Interfaces">
-  <p class="eyebrow">Field manual · architecture proof</p>
-  <h1>Interfaces for accountable work.</h1>
-  <p class="lead">
-    A fast, knowledge-first environment for prototyping serious interfaces while preserving the speed and confidence of plain HTML.
-  </p>
+<BaseLayout title="Working Interfaces" description="Astro shell for the Working Interfaces field manual and knowledge records.">
+  <section class="hero-panel">
+    <div>
+      <p class="eyebrow">Field manual · architecture proof</p>
+      <h1>Interfaces for accountable work.</h1>
+      <p class="lead">
+        A fast, knowledge-first environment for prototyping serious interfaces while preserving the speed and confidence of plain HTML.
+      </p>
+    </div>
+    <div class="hero-points">
+      <div class="panel stat-card"><strong>{manualPages.length}</strong><span>manual chapters migrated into Astro routes</span></div>
+      <div class="panel stat-card"><strong>{referencePages.length}</strong><span>reference app preserved as a route</span></div>
+      <div class="panel stat-card"><strong>1</strong><span>raw HTML prototype lane kept in /legacy/</span></div>
+    </div>
+  </section>
 
-  <div class="grid">
-    <section class="panel">
-      <h2>Prototype lane</h2>
-      <p>Open the existing visual studies unchanged, or add a new one-shot HTML experiment.</p>
-      <a href="/experiments/">Browse experiments →</a>
+  <div class="hero-grid">
+    <section class="panel panel--wide">
+      <p class="eyebrow">Manual</p>
+      <h2>All chapters now resolve inside Astro.</h2>
+      <p>The legacy HTML remains unchanged in `public/legacy`, but the canonical links now point at Astro routes that wrap the same page output.</p>
+      <a href="/manual/">Open the manual index →</a>
     </section>
     <section class="panel">
-      <h2>Knowledge loop</h2>
+      <p class="eyebrow">Knowledge loop</p>
+      <h2>Canonical record</h2>
       <p>One Markdown record becomes a readable page, JSON resource, and raw download.</p>
       <a href="/knowledge/">Inspect the first record →</a>
     </section>
     <section class="panel">
-      <h2>Legacy field manual</h2>
-      <p>The complete original Case Systems manual remains intact as design evidence.</p>
-      <a href="/legacy/">Open the manual →</a>
+      <p class="eyebrow">Reference app</p>
+      <h2>Golden implementation</h2>
+      <p>The domain-switching case shell stays intact as the primary implementation reference.</p>
+      <a href="/reference/case-system-reference-app/">Open reference app →</a>
+    </section>
+    <section class="panel">
+      <p class="eyebrow">Prototype lane</p>
+      <h2>Raw HTML still ships.</h2>
+      <p>The original static files remain available under /legacy/ for direct comparison and experiments.</p>
+      <a href="/experiments/">Browse experiments →</a>
     </section>
   </div>
+
+  <section class="panel panel--wide">
+    <p class="eyebrow">Migration map</p>
+    <div class="chapter-list">
+      {manualPages.map((page, index) => (
+        <a class="chapter-row" href={`/manual/${page.slug}/`}>
+          <span>{String(index + 1).padStart(2, '0')}</span>
+          <strong>{page.title}</strong>
+          <em>{page.summary}</em>
+        </a>
+      ))}
+    </div>
+  </section>
 </BaseLayout>
