@@ -1,0 +1,391 @@
+{
+  "document": {
+    "title": "Working Interfaces — Architecture Concept",
+    "version": "3.0",
+    "status": "work_in_progress",
+    "binding": false,
+    "updated_at": "2026-07-31",
+    "purpose": "Capture the current reduced architecture direction for rapid prototyping and later product development.",
+    "important_note": "This is a clean rewrite. It replaces the earlier architecture concept rather than extending it.",
+    "decision_rule": "Nothing becomes a fixed architectural rule until a real prototype or product workflow proves it."
+  },
+  "project_definition": {
+    "name": "Working Interfaces",
+    "working_description": "A knowledge-first design and prototyping environment for serious, information-rich interfaces.",
+    "current_focus": [
+      "Visual experimentation",
+      "Human-readable field manual",
+      "Canonical knowledge records",
+      "One real product workflow later"
+    ],
+    "not_currently_building": [
+      "A full framework platform",
+      "A component marketplace",
+      "A production MCP service",
+      "A generic SaaS application",
+      "A multi-service backend architecture"
+    ]
+  },
+  "core_principles": [
+    "Keep the speed and visibility of plain HTML.",
+    "Use TypeScript only where validation, durability, or product confidence matters.",
+    "Build one source of knowledge that can later feed multiple surfaces.",
+    "Prototype first, formalize after proof.",
+    "Do not create packages or services before they have a real consumer.",
+    "Keep framework-independent knowledge independent from applications.",
+    "Prefer domain language over generic SaaS structure."
+  ],
+  "phase_one_goal": {
+    "name": "Knowledge Loop",
+    "objective": "Prove that one canonical record can feed both human and machine-readable surfaces without reducing prototyping speed.",
+    "proof": [
+      "One Markdown record",
+      "Validated with a small Zod schema",
+      "Rendered as an Astro page",
+      "Emitted as JSON",
+      "Available as raw Markdown download"
+    ],
+    "success_criteria": [
+      "The authoring workflow remains fast.",
+      "Raw HTML experiments stay directly accessible.",
+      "The generated site is still inspectable HTML.",
+      "No advanced service architecture is required.",
+      "The result teaches us whether canonical records are useful."
+    ]
+  },
+  "phase_one_repository_shape": {
+    "apps": {
+      "field-manual": {
+        "technology": "Astro",
+        "purpose": "Human-facing publishing shell, navigation, record pages, and experiment index."
+      }
+    },
+    "experiments": {
+      "raw-html": {
+        "technology": "HTML, CSS, JavaScript",
+        "purpose": "Fast, unrestricted visual and interaction prototypes.",
+        "rules": [
+          "No TypeScript requirement.",
+          "No package extraction requirement.",
+          "No test requirement.",
+          "A prototype may remain only as visual evidence."
+        ]
+      }
+    },
+    "knowledge": {
+      "components": "Markdown records",
+      "patterns": "Markdown records",
+      "recipes": "YAML or JSON overlays",
+      "doctrine": "Markdown records"
+    },
+    "packages": {
+      "schemas": {
+        "technology": "TypeScript + Zod",
+        "purpose": "Minimal validation of canonical records."
+      },
+      "tokens": {
+        "status": "optional_in_phase_one",
+        "purpose": "Only add when shared semantic tokens are actually used."
+      }
+    },
+    "explicitly_absent": [
+      "platform app",
+      "platform API app",
+      "knowledge Worker",
+      "MCP server",
+      "Lit package",
+      "database package",
+      "registry package",
+      "context-builder package"
+    ]
+  },
+  "authoring_workflow": {
+    "priority": "highest",
+    "tools": [
+      "VS Code",
+      "Git",
+      "Markdown with frontmatter",
+      "YAML or JSON for structured overlays",
+      "Zod validation",
+      "Astro local preview"
+    ],
+    "flow": [
+      "Create or change an idea in raw HTML.",
+      "When the idea survives, write a short canonical record.",
+      "Validate only essential metadata.",
+      "Render the record in the field manual.",
+      "Generate JSON from the same source.",
+      "Keep the original source downloadable."
+    ],
+    "essential_record_fields": [
+      "id",
+      "title",
+      "status",
+      "kind",
+      "revision"
+    ],
+    "deferred_authoring_tools": [
+      "CMS",
+      "Visual record editor",
+      "Remote editing service"
+    ]
+  },
+  "technology_choices_now": {
+    "HTML_CSS_JavaScript": {
+      "status": "active",
+      "role": "Primary rapid-prototyping medium."
+    },
+    "Astro": {
+      "status": "active_for_phase_one",
+      "role": "Field-manual publishing shell and typed content consumer.",
+      "constraint": "Astro must not become the framework core."
+    },
+    "TypeScript": {
+      "status": "limited_use",
+      "role": "Validation, build logic, and later durable product code.",
+      "rule": "Use simple TypeScript; avoid clever type architecture."
+    },
+    "Zod": {
+      "status": "active_for_phase_one",
+      "role": "Small validation layer for record metadata."
+    },
+    "Markdown_YAML_JSON": {
+      "status": "active",
+      "role": "Canonical knowledge formats."
+    }
+  },
+  "technology_choices_deferred": {
+    "React": {
+      "status": "deferred_until_real_product",
+      "reason": "The product framework should be validated by an actual workflow rather than selected only from theory.",
+      "current_hypothesis": "React + Vite + TypeScript remains a strong candidate."
+    },
+    "Lit": {
+      "status": "deferred",
+      "reason": "Portability is not yet a real requirement.",
+      "trigger": "A proven component must genuinely run in at least two host frameworks."
+    },
+    "database": {
+      "status": "deferred",
+      "reason": "Real access patterns, provenance queries, append-only history, and operational needs are not yet known.",
+      "hard_rule": "Future domain logic should remain storage-independent."
+    },
+    "MCP": {
+      "status": "deferred",
+      "role": "Possible future delivery adapter only.",
+      "trigger": "Manual context bundles have proven useful and a real client needs MCP.",
+      "rule": "MCP must not influence the canonical knowledge model."
+    },
+    "HTTP_API": {
+      "status": "deferred",
+      "trigger": "A second real consumer requires programmatic access."
+    }
+  },
+  "adoption_lane": {
+    "status": "concept_to_validate",
+    "representation": "recipe overlay",
+    "purpose": "Express stricter vocabulary, process constraints, and visual defaults without changing the general core.",
+    "example_shape": {
+      "id": "adoption-lane",
+      "extends": "working-interfaces-core",
+      "vocabulary": {
+        "stage": "station",
+        "process": "lane"
+      },
+      "constraints": {
+        "stageOrder": "fixed",
+        "skippedStagesRemainVisible": true,
+        "noGoIsFirstClassOutcome": true,
+        "provenanceDisplay": "required"
+      },
+      "visualDefaults": {
+        "composition": "route-first",
+        "density": "compact"
+      }
+    },
+    "not_yet": [
+      "A separate package",
+      "A runtime recipe engine",
+      "A Boolean feature flag"
+    ]
+  },
+  "development_lanes": {
+    "lane_A_prototype": {
+      "name": "Raw visual experimentation",
+      "technology": "HTML, CSS, JavaScript",
+      "flow": [
+        "Idea",
+        "One-shot prototype",
+        "Inspect",
+        "Change radically",
+        "Keep or discard"
+      ]
+    },
+    "lane_B_knowledge": {
+      "name": "Canonical knowledge capture",
+      "technology": "Markdown, YAML, JSON, Zod",
+      "flow": [
+        "Promising idea",
+        "Short record",
+        "Validation",
+        "Human page",
+        "Machine-readable output"
+      ]
+    },
+    "lane_C_product": {
+      "name": "Durable product implementation",
+      "status": "later",
+      "flow": [
+        "Validated workflow",
+        "Product framework decision",
+        "Real data",
+        "Persistence",
+        "Accessibility",
+        "Tests"
+      ]
+    }
+  },
+  "milestones": [
+    {
+      "id": "M0",
+      "name": "Clean repository",
+      "output": "New Working Interfaces repository with current manual imported."
+    },
+    {
+      "id": "M1",
+      "name": "Prototype lane",
+      "output": "Raw HTML experiments remain directly usable and indexed."
+    },
+    {
+      "id": "M2",
+      "name": "Astro shell",
+      "output": "Homepage, shared navigation, experiment index, and one documentation layout."
+    },
+    {
+      "id": "M3",
+      "name": "One-source proof",
+      "output": "One Markdown record rendered as HTML, JSON, and raw Markdown."
+    },
+    {
+      "id": "M4",
+      "name": "Minimal validation",
+      "output": "Small Zod schema validating essential record metadata."
+    },
+    {
+      "id": "M5",
+      "name": "Adoption Lane overlay",
+      "output": "One machine-readable recipe overlay."
+    },
+    {
+      "id": "M6",
+      "name": "Second linked record",
+      "output": "One pattern record related to the first component record."
+    }
+  ],
+  "release_0_1": {
+    "name": "Knowledge Loop",
+    "contains": [
+      "Raw HTML experiments",
+      "Astro shell",
+      "Markdown and YAML knowledge records",
+      "Basic Zod validation",
+      "HTML output",
+      "JSON output",
+      "Raw Markdown download",
+      "Adoption Lane recipe overlay"
+    ],
+    "does_not_contain": [
+      "React product",
+      "API",
+      "MCP",
+      "Database",
+      "Lit",
+      "Context Builder",
+      "Large package structure"
+    ]
+  },
+  "later_product_hypothesis": {
+    "status": "not_yet_adopted",
+    "possible_stack": [
+      "React",
+      "TypeScript",
+      "Vite"
+    ],
+    "first_workflow": [
+      "Case",
+      "Evidence",
+      "Decision",
+      "Provenance"
+    ],
+    "organization_rule": "Feature-first structure using domain folders rather than generic technical folders.",
+    "example_features": [
+      "cases",
+      "evidence",
+      "decisions",
+      "provenance"
+    ]
+  },
+  "future_context_work": {
+    "status": "after_release_0_1",
+    "first_step": "Create one manual downloadable context bundle.",
+    "goal": "Test whether focused canonical knowledge improves LLM output.",
+    "only_after_proof": [
+      "Registry",
+      "Automated Context Builder",
+      "HTTP API",
+      "MCP adapter"
+    ]
+  },
+  "risks": [
+    {
+      "risk": "Architecture slows visual experimentation.",
+      "response": "Keep raw HTML as a permanent first-class lane."
+    },
+    {
+      "risk": "Astro becomes the framework core.",
+      "response": "Knowledge files and schemas remain usable without Astro."
+    },
+    {
+      "risk": "The repository grows speculative packages.",
+      "response": "Create packages only when a real consumer exists."
+    },
+    {
+      "risk": "Technology decisions are made before product evidence.",
+      "response": "Defer React, Lit, database, API, and MCP decisions until concrete triggers appear."
+    },
+    {
+      "risk": "Canonical knowledge becomes cumbersome to author.",
+      "response": "Start with direct Markdown and minimal validation; no CMS."
+    }
+  ],
+  "open_questions": [
+    "Does the one-record HTML/JSON/Markdown loop feel fast enough in daily use?",
+    "Should knowledge live at repository root or inside a package after phase one?",
+    "Is Markdown frontmatter sufficient for component and pattern records?",
+    "Does Adoption Lane work as a recipe overlay without a runtime engine?",
+    "Which real workflow should validate the future product stack?",
+    "When does a second consumer justify an API?",
+    "When does repeated manual bundle creation justify a Context Builder?"
+  ],
+  "next_action": {
+    "repository": "working-interfaces",
+    "branch": "feat/astro-authoring-proof",
+    "task": "Build the smallest authoring proof.",
+    "scope": [
+      "Minimal Astro shell",
+      "Preserved raw HTML experiments",
+      "One Markdown component record",
+      "One Zod schema",
+      "One generated human page",
+      "One JSON output",
+      "One raw Markdown download"
+    ]
+  },
+  "mantra": [
+    "Keep the speed of HTML.",
+    "Add TypeScript only where confidence matters.",
+    "Prototype brutally.",
+    "Formalize selectively.",
+    "Extract only after proof."
+  ]
+}

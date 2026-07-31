@@ -1,0 +1,13 @@
+{
+  "name": "@working-interfaces/field-manual",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/sync-downloads.mjs && astro dev",
+    "build": "node scripts/sync-downloads.mjs && astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "astro": "^6.0.0"
+  }
+}

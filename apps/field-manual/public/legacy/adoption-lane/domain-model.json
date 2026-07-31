@@ -1,0 +1,31 @@
+{
+  "extension": "Adoption Lane",
+  "route": {
+    "station_count": 9,
+    "persistent": true,
+    "equal_spacing": true
+  },
+  "method_objects": [
+    "Track",
+    "Segment",
+    "Gate",
+    "Projection",
+    "ValidatedValue",
+    "OrganizationalReflection"
+  ],
+  "invariants": [
+    "route remains visible",
+    "Proceed and No-Go are peers",
+    "skip reason remains visible",
+    "evidence does not erase projection",
+    "decision journal is append-only"
+  ],
+  "visual_preset": {
+    "geometry": "sharp structural planes",
+    "route_rendering": "custom SVG",
+    "color": "semantic only",
+    "metadata": "monospace",
+    "normal_state": "neutral",
+    "motion": "linear and causal"
+  }
+}

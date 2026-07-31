@@ -1,0 +1,28 @@
+---
+import '../styles/global.css';
+interface Props { title: string; description?: string; }
+const { title, description = 'Working Interfaces field manual' } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-header__inner shell">
+        <a class="brand" href="/">Working Interfaces</a>
+        <nav aria-label="Primary">
+          <a href="/knowledge/">Knowledge</a>
+          <a href="/experiments/">Experiments</a>
+          <a href="/legacy/">Legacy manual</a>
+        </nav>
+      </div>
+    </header>
+    <main class="shell"><slot /></main>
+    <footer><div class="shell">Prototype brutally. Formalize selectively. Extract only after proof.</div></footer>
+  </body>
+</html>

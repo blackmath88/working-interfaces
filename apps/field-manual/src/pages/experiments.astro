@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+const experiments = [
+  { title: 'Interface Field Guide', status: 'reference', href: '/legacy/manual/01-interface-field-guide.html' },
+  { title: 'Adoption Lane Decision Instrument', status: 'reference', href: '/legacy/manual/02-adoption-lane-decision-instrument.html' },
+  { title: 'Case Component Atlas', status: 'reference', href: '/legacy/manual/03-case-component-atlas.html' },
+  { title: 'Analytical Components', status: 'reference', href: '/legacy/manual/05-analytical-components.html' },
+  { title: 'Page Compositions', status: 'reference', href: '/legacy/manual/07-page-compositions.html' },
+  { title: 'Interaction Behavior', status: 'reference', href: '/legacy/manual/08-interaction-behavior.html' },
+  { title: 'Reference Application', status: 'reference', href: '/legacy/reference/case-system-reference-app.html' },
+];
+---
+<BaseLayout title="Experiments · Working Interfaces">
+  <p class="eyebrow">Raw HTML prototype lane</p>
+  <h1>Make it visible before making it durable.</h1>
+  <p class="lead">These studies remain plain HTML, CSS, and JavaScript. They are evidence, not production architecture.</p>
+  <div class="grid">
+    {experiments.map((item) => (
+      <article class="panel">
+        <p class="eyebrow">{item.status}</p>
+        <h2>{item.title}</h2>
+        <a href={item.href}>Open prototype →</a>
+      </article>
+    ))}
+  </div>
+</BaseLayout>

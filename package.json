@@ -1,0 +1,14 @@
+{
+  "name": "working-interfaces",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm --workspace @working-interfaces/field-manual run dev",
+    "build": "npm --workspace @working-interfaces/field-manual run build",
+    "preview": "npm --workspace @working-interfaces/field-manual run preview",
+    "deploy": "npm run build && npx wrangler@latest deploy"
+  }
+}
