@@ -1,6 +1,7 @@
 import { STATIONS } from './adoption-lane-data.mjs';
 import { parseRouteInput, routeForIds } from './adoption-lane-routing.mjs';
 import { createPortfolioRepository } from './adoption-lane-repository.mjs';
+import { initializeThemeToggle } from './adoption-lane-theme.mjs';
 
 const $ = selector => document.querySelector(selector);
 const page = $('#page');
@@ -277,11 +278,7 @@ $('#menuButton').addEventListener('click', () => {
   const open = $('#primaryNav').classList.toggle('open');
   $('#menuButton').setAttribute('aria-expanded', String(open));
 });
-$('#themeButton').addEventListener('click', () => {
-  const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-  document.documentElement.dataset.theme = theme;
-  localStorage.setItem('adoption-lane-theme', theme);
-});
+initializeThemeToggle();
 
 $('#loadDemoButton').addEventListener('click', () => showConfirmation({
   title: 'Demo-Daten laden?',
@@ -310,6 +307,5 @@ page.addEventListener('click', event => {
   showConfirmation({ title: 'Conclude this use case as No-Go?', body: 'This demo treats the conclusion as irreversible and retains prior recommendations as superseded history.', confirmLabel: 'Confirm No-Go', onConfirm: () => toast('No-Go conclusion confirmed in the demo.') });
 });
 
-document.documentElement.dataset.theme = localStorage.getItem('adoption-lane-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 if (!location.hash) history.replaceState(null, '', '#/control-center');
 render();

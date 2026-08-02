@@ -1,10 +1,17 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#0b7778">
   <title>Adoption Lane · Interaction Architecture</title>
+  <script>
+    try {
+      document.documentElement.dataset.theme = localStorage.getItem('adoption-lane-theme') === 'dark' ? 'dark' : 'light';
+    } catch {
+      document.documentElement.dataset.theme = 'light';
+    }
+  </script>
   <link rel="stylesheet" href="/legacy/reference/adoption-lane.css">
 </head>
 <body>
@@ -18,7 +25,10 @@
     <span class="demo-badge">Fictional demo data</span>
     <div class="top-actions">
       <button class="button quiet" id="loadDemoButton">Demo-Daten laden</button>
-      <button class="icon-button" id="themeButton" aria-label="Toggle color theme">◐</button>
+      <button class="theme-toggle button quiet" id="themeButton" type="button" aria-label="Dark theme" aria-pressed="false" title="Switch to dark theme">
+        <span class="theme-toggle__label">Theme</span>
+        <span class="theme-toggle__icon" data-theme-icon aria-hidden="true">☾</span>
+      </button>
     </div>
   </header>
 

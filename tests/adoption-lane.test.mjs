@@ -3,6 +3,12 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { DEMO_PORTFOLIO, STATIONS, validatePortfolio } from '../apps/field-manual/public/legacy/reference/adoption-lane-data.mjs';
 import { parseRouteInput, routeForIds } from '../apps/field-manual/public/legacy/reference/adoption-lane-routing.mjs';
+import {
+  THEME_STORAGE_KEY,
+  getStoredTheme,
+  toggleTheme,
+  updateThemeToggle,
+} from '../apps/field-manual/public/legacy/reference/adoption-lane-theme.mjs';
 
 test('demo portfolio has four valid fictional customers and twelve owned use cases', () => {
   assert.equal(DEMO_PORTFOLIO.customers.length, 4);
@@ -73,4 +79,62 @@ test('secondary accent is semantic and raw aubergine values only define tokens',
   assert.equal((css.match(/#6f4b68/g) || []).length, 1);
   assert.equal((css.match(/#eee7ec/g) || []).length, 1);
   assert.equal((css.match(/#56374f/g) || []).length, 1);
+});
+
+function storageWith(initialValue) {
+  const values = new Map();
+  if (initialValue !== undefined) values.set(THEME_STORAGE_KEY, initialValue);
+  return {
+    getItem: key => values.get(key) ?? null,
+    setItem: (key, value) => values.set(key, value),
+    value: key => values.get(key),
+  };
+}
+
+function themeButton() {
+  const attributes = new Map();
+  const icon = { textContent: '' };
+  return {
+    title: '',
+    setAttribute: (name, value) => attributes.set(name, value),
+    getAttribute: name => attributes.get(name),
+    querySelector: selector => selector === '[data-theme-icon]' ? icon : null,
+    icon,
+  };
+}
+
+test('theme storage resolves missing and invalid values to light', () => {
+  assert.equal(getStoredTheme(storageWith()), 'light');
+  assert.equal(getStoredTheme(storageWith('sepia')), 'light');
+});
+
+test('theme storage resolves explicit light and dark values', () => {
+  assert.equal(getStoredTheme(storageWith('light')), 'light');
+  assert.equal(getStoredTheme(storageWith('dark')), 'dark');
+});
+
+test('theme toggle updates the root attribute, storage, and accessible state', () => {
+  const storage = storageWith('light');
+  const root = { dataset: { theme: 'light' } };
+  const button = themeButton();
+
+  assert.equal(toggleTheme({ storage, root, button }), 'dark');
+  assert.equal(root.dataset.theme, 'dark');
+  assert.equal(storage.value(THEME_STORAGE_KEY), 'dark');
+  assert.equal(button.getAttribute('aria-pressed'), 'true');
+  assert.equal(button.title, 'Switch to light theme');
+  assert.equal(button.icon.textContent, '☀');
+
+  updateThemeToggle(button, 'light');
+  assert.equal(button.getAttribute('aria-pressed'), 'false');
+});
+
+test('theme initializes before styles without using the operating-system preference', async () => {
+  const html = await readFile(new URL('../apps/field-manual/public/legacy/reference/case-system-reference-app.html', import.meta.url), 'utf8');
+  const themeScriptPosition = html.indexOf("localStorage.getItem('adoption-lane-theme')");
+  const stylesheetPosition = html.indexOf('<link rel="stylesheet"');
+  assert.ok(themeScriptPosition > -1 && themeScriptPosition < stylesheetPosition);
+  assert.match(html, /<html lang="en" data-theme="light">/);
+  assert.doesNotMatch(html, /prefers-color-scheme/);
+  assert.match(html, /id="themeButton"[^>]*aria-label="Dark theme"[^>]*aria-pressed="false"/);
 });
