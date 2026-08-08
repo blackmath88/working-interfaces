@@ -1,4 +1,4 @@
-import { read, write } from './storage.ts';
+import { now, read, uid, write } from './storage.ts';
 
 export interface JournalEntry {
   readonly id: string;
@@ -6,47 +6,49 @@ export interface JournalEntry {
   readonly scope?: string;
   readonly decision: string;
   readonly rationale: string;
-  readonly alternatives_rejected: readonly string[];
+  readonly alternatives_rejected: string;
   readonly decided_by: string;
   readonly decided_at: string;
   readonly supersedes?: string;
 }
 
-export type JournalEntryDraft = Omit<JournalEntry, 'id' | 'decided_by' | 'decided_at'> & {
-  readonly id?: string;
-  readonly decided_at?: string;
-};
+export type JournalEntryDraft = Omit<JournalEntry, 'id' | 'decided_by' | 'decided_at'>
+  & Partial<Pick<JournalEntry, 'decided_by' | 'decided_at'>>;
 
 export type AuthorResolver = () => string | null | undefined;
 
-export function getJournal(storageKey: string): readonly JournalEntry[] {
-  return read<JournalEntry[]>(storageKey, []);
-}
+export const getJournal = (storageKey: string): JournalEntry[] =>
+  read<JournalEntry[]>(storageKey, []);
 
 export function appendEntry(
   storageKey: string,
   entry: JournalEntryDraft,
   resolveAuthor: AuthorResolver,
   fallbackAuthor: string,
-): JournalEntry {
-  const record: JournalEntry = {
-    ...entry,
-    id: entry.id ?? crypto.randomUUID(),
-    alternatives_rejected: [...entry.alternatives_rejected],
-    decided_by: resolveAuthor() || fallbackAuthor,
-    decided_at: entry.decided_at ?? new Date().toISOString(),
-  };
+): JournalEntry | null {
+  if (!entry.subjectId) return null;
   const journal = getJournal(storageKey);
+  const record: JournalEntry = {
+    id: uid(),
+    subjectId: entry.subjectId,
+    decision: entry.decision ?? '',
+    rationale: entry.rationale ?? '',
+    alternatives_rejected: entry.alternatives_rejected ?? '',
+    decided_by: entry.decided_by || resolveAuthor() || fallbackAuthor,
+    decided_at: entry.decided_at || now(),
+    ...(entry.scope ? { scope: entry.scope } : {}),
+    ...(entry.supersedes ? { supersedes: entry.supersedes } : {}),
+  };
   write(storageKey, [...journal, record]);
   return record;
 }
 
-export function supersede(
+/** Superseding is an append. The superseded entry is never removed. */
+export const supersede = (
   storageKey: string,
   previousId: string,
   entry: Omit<JournalEntryDraft, 'supersedes'>,
   resolveAuthor: AuthorResolver,
   fallbackAuthor: string,
-): JournalEntry {
-  return appendEntry(storageKey, { ...entry, supersedes: previousId }, resolveAuthor, fallbackAuthor);
-}
+): JournalEntry | null =>
+  appendEntry(storageKey, { ...entry, supersedes: previousId }, resolveAuthor, fallbackAuthor);

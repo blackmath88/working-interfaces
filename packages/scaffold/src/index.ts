@@ -1,16 +1,18 @@
 export { esc, fmt } from './canon/format.ts';
 export {
   CURRENT_SCHEMA_VERSION,
+  MIGRATIONS,
   configureNamespace,
   getDriver,
   key,
   keysWithPrefix,
   memoryDriver,
-  migrations,
+  migrate,
+  now,
   read,
   remove,
-  runMigrations,
   setDriver,
+  uid,
   write,
 } from './engine/storage.ts';
 export type { KeyValueDriver, Migration, MigrationReport } from './engine/storage.ts';
@@ -27,6 +29,7 @@ export {
   cameraViewBox,
   camerasClose,
   clampZoom,
+  easeOutCubic,
   fitCameraToBox,
   lerpCamera,
   zoomCameraAtPointer,

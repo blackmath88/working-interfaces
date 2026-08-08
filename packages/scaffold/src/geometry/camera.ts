@@ -1,84 +1,87 @@
 export interface Camera {
-  readonly x: number;
-  readonly y: number;
-  readonly zoom: number;
+  centerX: number;
+  centerY: number;
+  zoom: number;
 }
 
 export interface CameraViewport {
-  readonly width: number;
-  readonly height: number;
+  width: number;
+  height: number;
 }
 
 export interface BoundingBox {
-  readonly minX: number;
-  readonly minY: number;
-  readonly maxX: number;
-  readonly maxY: number;
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
 }
 
-export interface CameraPointer {
-  readonly x: number;
-  readonly y: number;
+export interface CameraPointer extends CameraViewport {
+  x: number;
+  y: number;
 }
 
-export const MIN_ZOOM = 0.25;
+export const MIN_ZOOM = 0.35;
 export const MAX_ZOOM = 4;
 
 export function clampZoom(zoom: number): number {
-  return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom));
+  return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom));
 }
 
-export function fitCameraToBox(box: BoundingBox, viewport: CameraViewport, padding = 32): Camera {
-  const width = Math.max(1, box.maxX - box.minX);
-  const height = Math.max(1, box.maxY - box.minY);
-  const availableWidth = Math.max(1, viewport.width - padding * 2);
-  const availableHeight = Math.max(1, viewport.height - padding * 2);
+/** Camera that frames a bounding box at a given fill ratio of the viewport. */
+export function fitCameraToBox(
+  box: BoundingBox,
+  viewport: CameraViewport,
+  fillRatio = 0.7,
+): Camera {
+  const boxW = Math.max(1, box.maxX - box.minX);
+  const boxH = Math.max(1, box.maxY - box.minY);
+  const zoomX = (viewport.width * fillRatio) / boxW;
+  const zoomY = (viewport.height * fillRatio) / boxH;
   return {
-    x: (box.minX + box.maxX) / 2,
-    y: (box.minY + box.maxY) / 2,
-    zoom: clampZoom(Math.min(availableWidth / width, availableHeight / height)),
+    centerX: (box.minX + box.maxX) / 2,
+    centerY: (box.minY + box.maxY) / 2,
+    zoom: clampZoom(Math.min(zoomX, zoomY)),
   };
 }
 
-export function lerpCamera(from: Camera, to: Camera, amount: number): Camera {
+export function lerpCamera(a: Camera, b: Camera, t: number): Camera {
   return {
-    x: from.x + (to.x - from.x) * amount,
-    y: from.y + (to.y - from.y) * amount,
-    zoom: from.zoom + (to.zoom - from.zoom) * amount,
+    centerX: a.centerX + (b.centerX - a.centerX) * t,
+    centerY: a.centerY + (b.centerY - a.centerY) * t,
+    zoom: Math.exp(Math.log(a.zoom) + (Math.log(b.zoom) - Math.log(a.zoom)) * t),
   };
 }
 
-export function cameraViewBox(camera: Camera, viewport: CameraViewport): BoundingBox {
+/** Ease-out cubic: quick start and a gentle stop. */
+export function easeOutCubic(t: number): number {
+  const clamped = Math.max(0, Math.min(1, t));
+  const inv = 1 - clamped;
+  return 1 - inv * inv * inv;
+}
+
+/** Whether two cameras have effectively reached the same position. */
+export function camerasClose(a: Camera, b: Camera): boolean {
+  return Math.abs(a.centerX - b.centerX) < 0.5
+    && Math.abs(a.centerY - b.centerY) < 0.5
+    && Math.abs(a.zoom - b.zoom) < 0.005;
+}
+
+export function cameraViewBox(camera: Camera, viewport: CameraViewport): string {
   const width = viewport.width / camera.zoom;
   const height = viewport.height / camera.zoom;
-  return {
-    minX: camera.x - width / 2,
-    minY: camera.y - height / 2,
-    maxX: camera.x + width / 2,
-    maxY: camera.y + height / 2,
-  };
+  return `${camera.centerX - width / 2} ${camera.centerY - height / 2} ${width} ${height}`;
 }
 
-export function zoomCameraAtPointer(
-  camera: Camera,
-  viewport: CameraViewport,
-  pointer: CameraPointer,
-  nextZoom: number,
-): Camera {
-  const zoom = clampZoom(nextZoom);
-  const offsetX = pointer.x - viewport.width / 2;
-  const offsetY = pointer.y - viewport.height / 2;
-  const worldX = camera.x + offsetX / camera.zoom;
-  const worldY = camera.y + offsetY / camera.zoom;
+export function zoomCameraAtPointer(camera: Camera, pointer: CameraPointer, factor: number): Camera {
+  const offsetX = pointer.x - pointer.width / 2;
+  const offsetY = pointer.y - pointer.height / 2;
+  const worldX = camera.centerX + offsetX / camera.zoom;
+  const worldY = camera.centerY + offsetY / camera.zoom;
+  const zoom = clampZoom(camera.zoom * factor);
   return {
-    x: worldX - offsetX / zoom,
-    y: worldY - offsetY / zoom,
+    centerX: worldX - offsetX / zoom,
+    centerY: worldY - offsetY / zoom,
     zoom,
   };
-}
-
-export function camerasClose(a: Camera, b: Camera, epsilon = 0.001): boolean {
-  return Math.abs(a.x - b.x) <= epsilon
-    && Math.abs(a.y - b.y) <= epsilon
-    && Math.abs(a.zoom - b.zoom) <= epsilon;
 }

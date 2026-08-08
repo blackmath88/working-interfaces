@@ -6,8 +6,8 @@ import {
   configureNamespace,
   key,
   memoryDriver,
+  migrate,
   read,
-  runMigrations,
   setDriver,
 } from '../src/engine/storage.ts';
 import { getJournal, appendEntry, supersede } from '../src/engine/journal.ts';
@@ -21,19 +21,19 @@ test('migrations run in order and write the version only after all succeed', () 
   configureNamespace('test_');
   const order = [];
   const migrations = [
-    { version: 1, migrate: () => order.push(1) },
-    { version: 2, migrate: () => order.push(2) },
+    { name: 'first', run: () => order.push(1) },
+    { name: 'second', run: () => order.push(2) },
   ];
 
-  assert.deepEqual(runMigrations(migrations).applied, [1, 2]);
+  assert.deepEqual(migrate(migrations).applied, ['first', 'second']);
   assert.deepEqual(order, [1, 2]);
   assert.equal(read(key('schema_version'), -1), 2);
 
   const failingDriver = memoryDriver();
   setDriver(failingDriver);
-  assert.throws(() => runMigrations([
-    { version: 1, migrate: () => undefined },
-    { version: 2, migrate: () => { throw new Error('stop'); } },
+  assert.throws(() => migrate([
+    { name: 'first', run: () => undefined },
+    { name: 'second', run: () => { throw new Error('stop'); } },
   ]), /stop/);
   assert.equal(failingDriver.getItem(key('schema_version')), null);
 });
@@ -42,29 +42,27 @@ test('superseding appends and leaves the original journal entry unchanged', () =
   setDriver(memoryDriver());
   const storageKey = 'journal';
   const first = appendEntry(storageKey, {
-    id: 'first',
     subjectId: 'subject-1',
     decision: 'Keep the first decision',
     rationale: 'It is supported',
-    alternatives_rejected: ['Replace it'],
+    alternatives_rejected: 'Replace it',
     decided_at: '2026-08-08T10:00:00.000Z',
   }, () => '', 'fallback');
   const snapshot = structuredClone(first);
 
   const second = supersede(storageKey, first.id, {
-    id: 'second',
     subjectId: 'subject-1',
     decision: 'Use the later decision',
     rationale: 'New evidence',
-    alternatives_rejected: ['Keep it'],
+    alternatives_rejected: 'Keep it',
     decided_at: '2026-08-08T11:00:00.000Z',
   }, () => 'author', 'fallback');
 
   const journal = getJournal(storageKey);
   assert.equal(journal.length, 2);
   assert.deepEqual(journal[0], snapshot);
-  assert.equal(journal[1]?.supersedes, first.id);
-  assert.equal(second.supersedes, first.id);
+  assert.equal(journal[1]?.supersedes, first?.id);
+  assert.equal(second?.supersedes, first?.id);
 });
 
 test('unsubscribe removes a store listener', () => {
@@ -107,12 +105,7 @@ test('format and camera primitives smoke test', () => {
   const camera = fitCameraToBox(
     { minX: 0, minY: 0, maxX: 100, maxY: 50 },
     { width: 200, height: 100 },
-    0,
+    1,
   );
-  assert.deepEqual(cameraViewBox(camera, { width: 200, height: 100 }), {
-    minX: 0,
-    minY: 0,
-    maxX: 100,
-    maxY: 50,
-  });
+  assert.equal(cameraViewBox(camera, { width: 200, height: 100 }), '0 0 100 50');
 });
