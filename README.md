@@ -10,7 +10,8 @@ One canonical Markdown record becomes:
 
 - a human-readable Astro page;
 - a JSON resource;
-- a raw Markdown download.
+- a raw Markdown download;
+- for foundations, generated CSS custom properties.
 
 The existing Case Systems field manual remains available unchanged under `/legacy/`.
 

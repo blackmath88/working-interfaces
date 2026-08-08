@@ -7,4 +7,4 @@ dist/
 .env
 .env.*
 !.env.example
-
+apps/field-manual/src/styles/tokens.css

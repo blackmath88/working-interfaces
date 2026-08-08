@@ -1,18 +1,24 @@
+@import './tokens.css';
+
 :root {
   font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #17191d;
+  color: var(--text-primary);
   background:
-    radial-gradient(circle at top left, rgba(98, 89, 232, .08), transparent 32%),
-    linear-gradient(180deg, #f5f2ea 0%, #f1eee6 100%);
+    radial-gradient(circle at top left, color-mix(in oklab, var(--focus-primary) 8%, transparent), transparent 32%),
+    linear-gradient(180deg, color-mix(in oklab, var(--surface-paper) 27%, var(--surface-canvas)) 0%, var(--surface-canvas) 100%);
   font-synthesis: none;
-  --ink: #17191d;
-  --muted: #646972;
-  --paper: rgba(255, 253, 247, .92);
-  --paper-strong: #fffdf7;
-  --line: #cec9bf;
-  --accent: #6259e8;
-  --accent-soft: #ebe8ff;
-  --shadow: 0 20px 64px rgba(24, 28, 36, .08);
+  --ink: var(--text-primary);
+  --muted: var(--text-muted);
+  --paper: color-mix(in oklab, var(--surface-paper) 92%, transparent);
+  --paper-strong: var(--surface-paper);
+  --line: var(--border-structural);
+  --accent: var(--focus-primary);
+  --accent-soft: color-mix(in oklab, var(--focus-primary) 14%, var(--surface-paper));
+  --good: var(--state-settled);
+  --warn: var(--state-uncertain);
+  --bad: var(--state-blocked);
+  --info: var(--track-primary);
+  --shadow: 0 20px 64px color-mix(in oklab, var(--text-primary) 8%, transparent);
   --measure: 78rem;
 }
 
@@ -72,6 +78,11 @@ p, li { line-height: 1.65; }
 .actions { display: flex; flex-wrap: wrap; gap: .75rem; margin: 2rem 0; }
 .button { display: inline-block; border: 1px solid var(--ink); padding: .65rem .85rem; text-decoration: none; background: var(--ink); color: white; }
 .button--secondary { background: transparent; color: var(--ink); }
+.token-grid { display: grid; gap: .75rem; margin: 2rem 0; }
+.token-card { display: grid; grid-template-columns: 4rem minmax(0, 1fr); gap: 1rem; align-items: center; border-top: 1px solid var(--line); padding-top: .75rem; }
+.token-card h2 { margin: 0 0 .25rem; font-size: 1rem; font-family: "SFMono-Regular", Consolas, monospace; letter-spacing: 0; }
+.token-card p { margin: .25rem 0 0; color: var(--muted); }
+.token-swatch { width: 4rem; height: 4rem; background: var(--swatch); border: 1px solid var(--line); }
 .prose { max-width: 48rem; }
 .prose h2 { border-top: 1px solid var(--line); padding-top: 1.5rem; }
 .prose ul { padding-left: 1.2rem; }

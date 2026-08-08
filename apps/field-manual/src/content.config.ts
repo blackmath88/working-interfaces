@@ -40,4 +40,33 @@ const patterns = defineCollection({
   }),
 });
 
-export const collections = { patterns };
+const token = z.union([
+  z.object({
+    light: z.string().regex(/^oklch\(.+\)$/),
+    note: z.string().min(1),
+  }),
+  z.object({
+    value: z.string().min(1),
+    range: z.string().optional(),
+    note: z.string().optional(),
+  }),
+]);
+
+const foundations = defineCollection({
+  loader: glob({
+    base: '../../knowledge/foundations',
+    pattern: '*.md',
+  }),
+  schema: z.object({
+    id: z.string().min(1),
+    title: z.string().min(1),
+    status: knowledgeStatus,
+    kind: knowledgeKind,
+    revision: z.number().int().positive(),
+    summary: z.string().min(1),
+    tokens: z.record(z.string(), token),
+    related: z.array(z.string()).default([]),
+  }),
+});
+
+export const collections = { patterns, foundations };

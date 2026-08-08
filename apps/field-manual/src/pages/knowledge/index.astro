@@ -1,7 +1,10 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-const records = await getCollection('patterns');
+const records = [
+  ...await getCollection('patterns'),
+  ...await getCollection('foundations'),
+];
 ---
 <BaseLayout title="Knowledge · Working Interfaces">
   <p class="eyebrow">Canonical records</p>
