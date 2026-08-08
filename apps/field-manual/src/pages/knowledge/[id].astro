@@ -3,8 +3,8 @@ import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 export async function getStaticPaths() {
-  const records = await getCollection('components');
-  return records.map((record) => ({ params: { id: record.id }, props: { record } }));
+  const records = await getCollection('patterns');
+  return records.map((record) => ({ params: { id: record.data.id }, props: { record } }));
 }
 
 const { record } = Astro.props;
@@ -20,8 +20,8 @@ const { Content } = await render(record);
   </div>
   <p class="lead">{record.data.summary}</p>
   <div class="actions">
-    <a class="button" href={`/api/knowledge/${record.id}.json`}>View JSON</a>
-    <a class="button button--secondary" href={`/downloads/knowledge/components/${record.id}.md`} download>Download Markdown</a>
+    <a class="button" href={`/api/knowledge/${record.data.id}.json`}>View JSON</a>
+    <a class="button button--secondary" href={`/downloads/knowledge/patterns/provenance/${record.data.id}.md`} download>Download Markdown</a>
   </div>
   <article class="prose"><Content /></article>
 </BaseLayout>

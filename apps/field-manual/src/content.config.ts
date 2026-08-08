@@ -15,11 +15,13 @@ const knowledgeKind = z.enum([
   'component',
   'pattern',
   'doctrine',
+  'foundation',
+  'motion',
 ]);
 
-const components = defineCollection({
+const patterns = defineCollection({
   loader: glob({
-    base: '../../knowledge/components',
+    base: '../../knowledge/patterns',
     pattern: '**/*.md',
   }),
   schema: z.object({
@@ -30,7 +32,12 @@ const components = defineCollection({
     revision: z.number().int().positive(),
     summary: z.string().min(1),
     related: z.array(z.string()).default([]),
+    implementation: z.object({
+      html: z.string().optional(),
+      react: z.string().optional(),
+      status: z.enum(['none', 'experimental', 'stable']).default('none'),
+    }).optional(),
   }),
 });
 
-export const collections = { components };
+export const collections = { patterns };

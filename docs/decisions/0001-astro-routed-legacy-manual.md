@@ -25,8 +25,8 @@ wrapper rather than through repeated edits to every legacy source.
 This approach preserves visual parity and existing interaction behavior. It is
 not a complete migration of the manual into native Astro content or components.
 
-Raw HTML experimentation remains a first-class development lane under
-`experiments/raw-html`. Experiments can stay as evidence, be documented, or have
+HTML experimentation remains a first-class development lane under
+`experiments/html`. Experiments can stay as evidence, be documented, or have
 only their proven parts migrated later.
 
 ## Consequences
@@ -52,4 +52,3 @@ only their proven parts migrated later.
 Shared structures may be extracted selectively after repeated use proves their
 value. A mass rewrite of the legacy manual is explicitly not planned. Future
 work should prefer small migrations with visual comparison and link verification.
-

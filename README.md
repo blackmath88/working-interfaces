@@ -20,8 +20,8 @@ Astro owns routing, publishing, and the outer field-manual shell. The establishe
 manual chapters remain HTML source documents in `apps/field-manual/public/legacy`;
 Astro reads and wraps them at build time so their existing visual appearance and
 interaction behavior remain intact. This is an interim routed-legacy architecture,
-not a complete native Astro content migration. Raw HTML experiments remain a
-first-class lane under `experiments/raw-html`, and proven structures may be
+not a complete native Astro content migration. HTML experiments remain a
+first-class lane under `experiments/html`, and proven structures may be
 extracted selectively later. A mass rewrite is not planned.
 
 ## Run locally
@@ -58,7 +58,7 @@ Wrangler publishes only `apps/field-manual/dist`.
 ## Current scope
 
 - Astro field-manual shell
-- raw HTML prototype lane
+- HTML prototype lane
 - canonical Markdown/YAML knowledge
 - minimal Zod validation through Astro content collections
 
