@@ -13,7 +13,7 @@ export const GET: APIRoute = ({ props }) => {
   const { record } = props;
   const source = record.collection === 'foundations'
     ? `/downloads/knowledge/foundations/${record.data.id}.md`
-    : `/downloads/knowledge/patterns/provenance/${record.data.id}.md`;
+    : `/downloads/knowledge/patterns/${record.id}.md`;
   return new Response(JSON.stringify({
     id: record.data.id,
     ...record.data,

@@ -14,7 +14,7 @@ const { record } = Astro.props;
 const { Content } = await render(record);
 const source = record.collection === 'foundations'
   ? `/downloads/knowledge/foundations/${record.data.id}.md`
-  : `/downloads/knowledge/patterns/provenance/${record.data.id}.md`;
+  : `/downloads/knowledge/patterns/${record.id}.md`;
 const tokens = 'tokens' in record.data ? Object.entries(record.data.tokens) : [];
 ---
 <BaseLayout title={`${record.data.title} · Working Interfaces`} description={record.data.summary}>
