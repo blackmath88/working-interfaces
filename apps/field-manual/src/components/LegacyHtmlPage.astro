@@ -4,9 +4,10 @@ interface Props {
   description?: string;
   headHtml: string;
   bodyHtml: string;
+  returnHref?: string;
 }
 
-const { title, description, headHtml, bodyHtml } = Astro.props;
+const { title, description, headHtml, bodyHtml, returnHref } = Astro.props;
 
 function escapeHtml(value: string) {
   return value.replace(/[&<>"]/g, (character) => {
@@ -20,15 +21,23 @@ function escapeHtml(value: string) {
   });
 }
 
-const cleanedHead = headHtml.replace(/<title>[\s\S]*?<\/title>/i, '').trim();
+const cleanedHead = headHtml
+  .replace(/<title>[\s\S]*?<\/title>/i, '')
+  .replace(/^[\t ]+$/gm, '')
+  .replace(/\n{3,}/g, '\n\n')
+  .trim();
 const headMarkup = [
   `<title>${escapeHtml(title)}</title>`,
   description ? `<meta name="description" content="${escapeHtml(description)}">` : '',
   cleanedHead,
 ].filter(Boolean).join('\n');
+
+const normalizedBody = returnHref
+  ? bodyHtml.replace(/href=(["'])\.\.\/index\.html\1/gi, `href=$1${returnHref}$1`)
+  : bodyHtml;
 ---
 <!doctype html>
 <html lang="en">
   <head set:html={headMarkup}></head>
-  <body set:html={bodyHtml}></body>
+  <body set:html={normalizedBody}></body>
 </html>

@@ -3,12 +3,19 @@ import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 export async function getStaticPaths() {
-  const records = await getCollection('components');
-  return records.map((record) => ({ params: { id: record.id }, props: { record } }));
+  const records = [
+    ...await getCollection('patterns'),
+    ...await getCollection('foundations'),
+  ];
+  return records.map((record) => ({ params: { id: record.data.id }, props: { record } }));
 }
 
 const { record } = Astro.props;
 const { Content } = await render(record);
+const source = record.collection === 'foundations'
+  ? `/downloads/knowledge/foundations/${record.data.id}.md`
+  : `/downloads/knowledge/patterns/provenance/${record.data.id}.md`;
+const tokens = 'tokens' in record.data ? Object.entries(record.data.tokens) : [];
 ---
 <BaseLayout title={`${record.data.title} · Working Interfaces`} description={record.data.summary}>
   <p class="eyebrow">Canonical {record.data.kind}</p>
@@ -20,8 +27,23 @@ const { Content } = await render(record);
   </div>
   <p class="lead">{record.data.summary}</p>
   <div class="actions">
-    <a class="button" href={`/api/knowledge/${record.id}.json`}>View JSON</a>
-    <a class="button button--secondary" href={`/downloads/knowledge/components/${record.id}.md`} download>Download Markdown</a>
+    <a class="button" href={`/api/knowledge/${record.data.id}.json`}>View JSON</a>
+    <a class="button button--secondary" href={source} download>Download Markdown</a>
   </div>
+  {tokens.length > 0 && (
+    <section class="token-grid" aria-label={`${record.data.title} tokens`}>
+      {tokens.map(([name, token]) => (
+        <article class="token-card">
+          {'light' in token && <span class="token-swatch" style={`--swatch: ${token.light}`} aria-hidden="true"></span>}
+          <div>
+            <h2>{name}</h2>
+            <code>{'light' in token ? token.light : token.value}</code>
+            {'note' in token && token.note && <p>{token.note}</p>}
+            {'range' in token && token.range && <p>Range: {token.range}</p>}
+          </div>
+        </article>
+      ))}
+    </section>
+  )}
   <article class="prose"><Content /></article>
 </BaseLayout>

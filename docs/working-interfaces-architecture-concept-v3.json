@@ -61,7 +61,7 @@
       }
     },
     "experiments": {
-      "raw-html": {
+      "html": {
         "technology": "HTML, CSS, JavaScript",
         "purpose": "Fast, unrestricted visual and interaction prototypes.",
         "rules": [

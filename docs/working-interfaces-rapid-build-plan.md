@@ -47,7 +47,7 @@ working-interfaces/
 ├── apps/
 │   └── field-manual/
 ├── experiments/
-│   └── raw-html/
+│   └── html/
 ├── knowledge/
 ├── docs/
 │   └── decisions/
@@ -82,7 +82,7 @@ Do not create yet:
 Move the current visual studies into:
 
 ```text
-experiments/raw-html/
+experiments/html/
 ```
 
 These remain:
@@ -157,7 +157,7 @@ Astro should link to or embed the raw HTML experiments.
 Create one canonical knowledge record:
 
 ```text
-knowledge/components/provenance-value.md
+knowledge/patterns/provenance/provenance-value.md
 ```
 
 Example frontmatter:
@@ -441,7 +441,7 @@ Automation follows pain. It does not precede it.
 ## Lane A — Fast visual experimentation
 
 ```text
-experiments/raw-html/
+experiments/html/
 ```
 
 Use for:
@@ -503,7 +503,7 @@ packages/
 └── core/              # only when needed
 
 experiments/
-└── raw-html/
+└── html/
 ```
 
 Boundary rule:

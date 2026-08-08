@@ -1,7 +1,10 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-const records = await getCollection('components');
+const records = [
+  ...await getCollection('patterns'),
+  ...await getCollection('foundations'),
+];
 ---
 <BaseLayout title="Knowledge · Working Interfaces">
   <p class="eyebrow">Canonical records</p>
@@ -13,7 +16,7 @@ const records = await getCollection('components');
         <p class="eyebrow">{record.data.kind} · {record.data.status}</p>
         <h2>{record.data.title}</h2>
         <p>{record.data.summary}</p>
-        <a href={`/knowledge/${record.id}/`}>Open record →</a>
+        <a href={`/knowledge/${record.data.id}/`}>Open record →</a>
       </article>
     ))}
   </div>
