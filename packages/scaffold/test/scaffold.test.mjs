@@ -5,9 +5,11 @@ import { esc, fmt } from '../src/canon/format.ts';
 import {
   configureNamespace,
   key,
+  keysWithPrefix,
   memoryDriver,
   migrate,
   read,
+  remove,
   setDriver,
 } from '../src/engine/storage.ts';
 import { getJournal, appendEntry, supersede } from '../src/engine/journal.ts';
@@ -15,7 +17,7 @@ import { notify, subscribe } from '../src/engine/store.ts';
 import { deserialize, navigate, onRouteChange, serialize } from '../src/engine/router.ts';
 import { cameraViewBox, fitCameraToBox } from '../src/geometry/camera.ts';
 
-test('migrations run in order and write the version only after all succeed', () => {
+test('migrations run in order', () => {
   const driver = memoryDriver();
   setDriver(driver);
   configureNamespace('test_');
@@ -28,14 +30,33 @@ test('migrations run in order and write the version only after all succeed', () 
   assert.deepEqual(migrate(migrations).applied, ['first', 'second']);
   assert.deepEqual(order, [1, 2]);
   assert.equal(read(key('schema_version'), -1), 2);
+});
 
+test('a failed migration leaves the schema version untouched', () => {
   const failingDriver = memoryDriver();
   setDriver(failingDriver);
+  configureNamespace('test_');
   assert.throws(() => migrate([
     { name: 'first', run: () => undefined },
     { name: 'second', run: () => { throw new Error('stop'); } },
   ]), /stop/);
   assert.equal(failingDriver.getItem(key('schema_version')), null);
+});
+
+test('keysWithPrefix snapshots keys so every match can be deleted during iteration', () => {
+  const driver = memoryDriver({
+    item_1: 'one',
+    item_2: 'two',
+    item_3: 'three',
+    other: 'keep',
+  });
+  setDriver(driver);
+
+  for (const storageKey of keysWithPrefix('item_')) remove(storageKey);
+
+  assert.deepEqual(keysWithPrefix('item_'), []);
+  assert.equal(driver.getItem('other'), 'keep');
+  assert.equal(driver.length, 1);
 });
 
 test('superseding appends and leaves the original journal entry unchanged', () => {
