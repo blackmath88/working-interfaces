@@ -16,6 +16,10 @@ export type {
   MigrationReport,
   StorageOptions,
 } from './engine/storage.ts';
+export { LocalStorageBackend } from './engine/state-backend.ts';
+export type { LocalStorageBackendOptions, StorageBackend } from './engine/state-backend.ts';
+export { RemoteStorageBackend } from './engine/remote-storage.ts';
+export type { RemoteStorageMessages, RemoteStorageOptions } from './engine/remote-storage.ts';
 export { notify, subscribe } from './engine/store.ts';
 export { appendEntry, getJournal, supersede } from './engine/journal.ts';
 export type { AuthorResolver, JournalEntry, JournalEntryDraft } from './engine/journal.ts';
