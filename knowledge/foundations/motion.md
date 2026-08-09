@@ -1,16 +1,16 @@
 ---
 id: motion
 title: Motion
-kind: motion
+kind: foundation
 status: experiment
 revision: 1
 summary: Motion explains causality, continuity, and state change; it never decorates the interface.
 tokens:
-  duration.fast:     { value: "160ms", range: "120–180ms", note: "hover, focus, selection" }
-  duration.standard: { value: "260ms", range: "220–320ms", note: "panels, save confirmation, inline expansion" }
-  duration.travel:   { value: "440ms", range: "350–550ms", note: "stage progression and carried information" }
-  easing.standard:   { value: "cubic-bezier(.2,.8,.2,1)" }
-  easing.exit:       { value: "cubic-bezier(.4,0,1,1)" }
+  duration.fast:     { range: "120–180ms", note: "hover, focus, selection" }
+  duration.standard: { range: "220–320ms", note: "panels, save confirmation, inline expansion" }
+  duration.travel:   { range: "350–550ms", note: "stage progression and carried information" }
+  easing.standard:   { note: "default entrance and state-change curve" }
+  easing.exit:       { note: "objects leaving the current context" }
 related: []
 ---
 

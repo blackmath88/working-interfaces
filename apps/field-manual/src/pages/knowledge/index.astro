@@ -4,6 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 const records = [
   ...await getCollection('patterns'),
   ...await getCollection('foundations'),
+  ...await getCollection('styles'),
 ];
 ---
 <BaseLayout title="Knowledge · Working Interfaces">

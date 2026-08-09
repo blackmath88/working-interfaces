@@ -6,6 +6,15 @@ const { title, description = 'Working Interfaces field manual' } = Astro.props;
 <!doctype html>
 <html lang="en">
   <head>
+    <script is:inline>
+      (() => {
+        let theme = 'institutional-light';
+        try {
+          if (localStorage.getItem('working-interfaces-style') === 'signal-dark') theme = 'signal-dark';
+        } catch {}
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
     <meta name="description" content={description} />
@@ -22,9 +31,33 @@ const { title, description = 'Working Interfaces field manual' } = Astro.props;
           <a href="/reference/case-system-reference-app/">Reference app</a>
           <a href="/legacy/">Legacy manual</a>
         </nav>
+        <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false">Signal dark</button>
       </div>
     </header>
     <main class="shell"><slot /></main>
     <footer><div class="shell">Prototype brutally. Formalize selectively. Extract only after proof.</div></footer>
+    <script is:inline>
+      (() => {
+        const button = document.querySelector('[data-theme-toggle]');
+        if (!(button instanceof HTMLButtonElement)) return;
+
+        const update = () => {
+          const dark = document.documentElement.dataset.theme === 'signal-dark';
+          button.textContent = dark ? 'Institutional light' : 'Signal dark';
+          button.setAttribute('aria-label', `Use ${dark ? 'Institutional Light' : 'Signal Dark'} style`);
+          button.setAttribute('aria-pressed', String(dark));
+        };
+
+        button.addEventListener('click', () => {
+          const next = document.documentElement.dataset.theme === 'signal-dark'
+            ? 'institutional-light'
+            : 'signal-dark';
+          document.documentElement.dataset.theme = next;
+          try { localStorage.setItem('working-interfaces-style', next); } catch {}
+          update();
+        });
+        update();
+      })();
+    </script>
   </body>
 </html>

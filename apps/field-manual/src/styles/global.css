@@ -24,6 +24,7 @@
 
 * { box-sizing: border-box; }
 html { color-scheme: light; scroll-behavior: smooth; }
+html[data-theme="signal-dark"] { color-scheme: dark; }
 body { margin: 0; min-height: 100vh; color: var(--ink); }
 a { color: inherit; }
 code, pre { font-family: "SFMono-Regular", Consolas, monospace; }
@@ -40,6 +41,7 @@ code, pre { font-family: "SFMono-Regular", Consolas, monospace; }
 nav { display: flex; flex-wrap: wrap; gap: 1rem; font-size: .92rem; }
 nav a { color: var(--muted); text-decoration: none; }
 nav a:hover { color: var(--ink); }
+.theme-toggle { border: 1px solid var(--line); padding: .45rem .65rem; background: var(--paper-strong); color: var(--ink); cursor: pointer; }
 main { padding: 4rem 0 6rem; }
 .eyebrow { text-transform: uppercase; letter-spacing: .14em; font-size: .72rem; font-weight: 800; color: var(--accent); }
 h1 { max-width: 16ch; font-size: clamp(2.9rem, 8vw, 6.5rem); line-height: .92; letter-spacing: -.07em; margin: .7rem 0 1.25rem; }
@@ -77,6 +79,7 @@ p, li { line-height: 1.65; }
 .tag { border: 1px solid var(--line); padding: .3rem .55rem; font-size: .78rem; }
 .actions { display: flex; flex-wrap: wrap; gap: .75rem; margin: 2rem 0; }
 .button { display: inline-block; border: 1px solid var(--ink); padding: .65rem .85rem; text-decoration: none; background: var(--ink); color: white; }
+[data-theme="signal-dark"] .button { color: var(--surface-canvas); }
 .button--secondary { background: transparent; color: var(--ink); }
 .token-grid { display: grid; gap: .75rem; margin: 2rem 0; }
 .token-card { display: grid; grid-template-columns: 4rem minmax(0, 1fr); gap: 1rem; align-items: center; border-top: 1px solid var(--line); padding-top: .75rem; }
