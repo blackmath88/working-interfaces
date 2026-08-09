@@ -23,6 +23,14 @@ The scaffold does not provide a domain model or shell markup. Those remain local
 
 The scaffold now has a working consumer in `experiments/scaffold-lab`, ported from the preserved single-file study.
 
+## Storage is an instance
+
+Storage is created explicitly with a driver and a namespace, and each instance is independent. There is no process-wide driver to set, so two parts of an application—or two demonstrations on one page—can hold different backing stores at the same time without saving and restoring a global.
+
+## Checkpointed migrations
+
+Migrations are numbered functions run in order, and the schema version is written after *each* one succeeds, not once after the whole run. A migration that throws stops the run at a known version: the steps before it are recorded as done, the failing step is named in the report, and the next run resumes at that step. No migration runs twice, so migrations do not have to be idempotent.
+
 ## Domain state and view state
 
 Domain state records facts. It is persisted, migrated, and—when a decision changes—journaled. Every project owns its domain store and routes writes through that boundary.

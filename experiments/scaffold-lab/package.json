@@ -4,12 +4,12 @@
   "type": "module",
   "scripts": {
     "tokens": "node ../../apps/field-manual/scripts/sync-downloads.mjs",
-    "dev": "npm run tokens && node ../../node_modules/vite/bin/vite.js",
-    "build": "npm run tokens && node ../../packages/scaffold/node_modules/typescript/bin/tsc --project tsconfig.json && node ../../node_modules/vite/bin/vite.js build",
-    "preview": "node ../../node_modules/vite/bin/vite.js preview"
+    "dev": "npm run tokens && vite",
+    "build": "npm run tokens && tsc --project tsconfig.json && vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@working-interfaces/scaffold": "workspace:*"
+    "@working-interfaces/scaffold": "*"
   },
   "devDependencies": {
     "typescript": "^5.9.3",

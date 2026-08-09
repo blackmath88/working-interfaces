@@ -1,20 +1,15 @@
 import {
   appendEntry,
+  createStorage,
   deserialize,
-  getDriver,
   getJournal,
-  key,
   memoryDriver,
-  migrate,
   notify,
   now,
-  read,
-  setDriver,
   subscribe,
   supersede,
-  write,
 } from '@working-interfaces/scaffold';
-import type { JournalEntry, KeyValueDriver, Migration, ViewState } from '@working-interfaces/scaffold';
+import type { JournalEntry, KeyValueDriver, KeyValueStorage, Migration, ViewState } from '@working-interfaces/scaffold';
 import { esc } from '@working-interfaces/scaffold';
 import { CHECKS } from '../domain/content.ts';
 import type { LabViewState, LogEntry, Snapshot } from '../domain/types.ts';
@@ -33,8 +28,7 @@ export interface LabRuntime {
   resetEphemeralForNavigation(): void;
 }
 
-const APP_JOURNAL_KEY = key('journal');
-const STORE_VALUE_KEY = key('store_demo_value');
+const STORE_VALUE_NAME = 'store_demo_value';
 
 const driverContents = (driver: KeyValueDriver): Record<string, unknown> => {
   const result: Record<string, unknown> = {};
@@ -48,22 +42,16 @@ const driverContents = (driver: KeyValueDriver): Record<string, unknown> => {
   return result;
 };
 
-const withDriver = <T>(driver: KeyValueDriver, operation: () => T): T => {
-  const previous = getDriver();
-  setDriver(driver);
-  try { return operation(); }
-  finally { setDriver(previous); }
-};
-
-export function createLabRuntime(view: ViewState<LabViewState>, appDriver: KeyValueDriver): LabRuntime {
+export function createLabRuntime(view: ViewState<LabViewState>, appStorage: KeyValueStorage): LabRuntime {
+  const journalKey = appStorage.key('journal');
   let understood: Record<string, boolean> = {};
   let domainName = '';
   let deriveLines = ['export function score(list) {', '  return list.length * 3', '}'];
   let demoSubscribers: Array<() => void> = [];
   let notifyCalls = 0;
   let cachedSubscriberValue = 0;
-  let storeDriver = memoryDriver({ [STORE_VALUE_KEY]: JSON.stringify(0) });
-  let migrationDriver = seededMigrationDriver();
+  let storeStorage = seededStoreStorage();
+  let migrationStorage = seededMigrationStorage();
   let migrationBefore: Record<string, unknown> | null = null;
   let migrationAfter: Record<string, unknown> | null = null;
   let migrationOutcome = 'Run a migration to inspect the real driver.';
@@ -83,19 +71,19 @@ export function createLabRuntime(view: ViewState<LabViewState>, appDriver: KeyVa
   }
 
   function addJournal(subjectId: string, decision: string, rationale: string): JournalEntry | null {
-    const entry = withDriver(appDriver, () => appendEntry(APP_JOURNAL_KEY, {
+    const entry = appendEntry(appStorage, journalKey, {
       subjectId,
       scope: 'scaffold-lab',
       decision,
       rationale,
       alternatives_rejected: 'Leave the previous state unchanged',
-    }, () => null, 'lab'));
+    }, () => null, 'lab');
     notify();
     return entry;
   }
 
   function journal(): readonly JournalEntry[] {
-    return withDriver(appDriver, () => getJournal(APP_JOURNAL_KEY));
+    return getJournal(appStorage, journalKey);
   }
 
   function liveEntries(): readonly JournalEntry[] {
@@ -104,24 +92,27 @@ export function createLabRuntime(view: ViewState<LabViewState>, appDriver: KeyVa
     return entries.filter((entry) => !superseded.has(entry.id));
   }
 
+  /** A run that follows a failure resumes; anything else starts from a fresh seed. */
   function runMigrations(broken: boolean): void {
-    if (broken || !retryAfterFailure) migrationDriver = seededMigrationDriver();
-    migrationBefore = driverContents(migrationDriver);
-    const migrations = migrationsFor(migrationDriver, broken);
-    try {
-      const report = withDriver(migrationDriver, () => migrate(migrations, 3));
-      migrationOutcome = `migrate() reported ${report.from} → ${report.to}; ${report.applied.join(', ')}. ${report.notes.join(' ')}`;
-      retryAfterFailure = false;
-      log(`stored version: ${String(readDriverVersion(migrationDriver))}`, 'ok');
-      report.applied.forEach((name) => log(`${name} — ok`, 'ok'));
-    } catch (error) {
-      migrationOutcome = error instanceof Error ? error.message : String(error);
-      retryAfterFailure = true;
-      log('migration 2 split-name — threw', 'fail');
-      log(`stored version read back from driver: ${String(readDriverVersion(migrationDriver))}`, 'fail');
-      log('The next working run re-enters at version 0; idempotent step 1 observes its prior work before step 2 retries.', 'fire');
+    const resuming = retryAfterFailure;
+    if (!resuming) migrationStorage = seededMigrationStorage();
+    migrationBefore = driverContents(migrationStorage.driver);
+
+    const report = migrationStorage.migrate(migrationsFor(migrationStorage, broken), 3);
+    retryAfterFailure = report.failed !== null;
+
+    if (resuming) log(`resumed at version ${report.from} — earlier migrations do not run again`, 'fire');
+    report.applied.forEach((name, offset) => log(`${name} — applied, version checkpointed to ${report.from + offset + 1}`, 'ok'));
+    if (report.failed) {
+      log(`${report.failed.name} — threw: ${report.failed.error.message}`, 'fail');
+      log(`run stopped; stored version read back from driver: ${String(readVersion(migrationStorage))}`, 'fail');
+      log('Run migrations 1 → 3 to retry. It resumes at the step that failed.', 'fire');
+      migrationOutcome = `migrate() reported ${report.from} → ${report.to}; applied ${report.applied.join(', ') || 'nothing'}; stopped at ${report.failed.name}. ${report.notes.join(' ')}`;
+    } else {
+      log(`stored version: ${String(readVersion(migrationStorage))}`, 'ok');
+      migrationOutcome = `migrate() reported ${report.from} → ${report.to}; applied ${report.applied.join(', ') || 'nothing'}. ${report.notes.join(' ')}`;
     }
-    migrationAfter = driverContents(migrationDriver);
+    migrationAfter = driverContents(migrationStorage.driver);
   }
 
   function runDemo(action: string): void {
@@ -130,7 +121,7 @@ export function createLabRuntime(view: ViewState<LabViewState>, appDriver: KeyVa
         clearLog();
         deriveLines = ['export function score(list) {', '  return list.length * 3', '}'];
         if (view.get().lesson === 'storage') {
-          migrationDriver = seededMigrationDriver();
+          migrationStorage = seededMigrationStorage();
           migrationBefore = null;
           migrationAfter = null;
           migrationOutcome = 'Run a migration to inspect the real driver.';
@@ -141,7 +132,7 @@ export function createLabRuntime(view: ViewState<LabViewState>, appDriver: KeyVa
           demoSubscribers = [];
           notifyCalls = 0;
           cachedSubscriberValue = 0;
-          storeDriver = memoryDriver({ [STORE_VALUE_KEY]: JSON.stringify(0) });
+          storeStorage = seededStoreStorage();
         }
         break;
       case 'mig-ok': runMigrations(false); break;
@@ -149,7 +140,7 @@ export function createLabRuntime(view: ViewState<LabViewState>, appDriver: KeyVa
       case 'sub': {
         const subscriberNumber = demoSubscribers.length + 1;
         const stop = subscribe(() => {
-          cachedSubscriberValue = withDriver(storeDriver, () => read<number>(STORE_VALUE_KEY, 0));
+          cachedSubscriberValue = storeStorage.read<number>(storeStorage.key(STORE_VALUE_NAME), 0);
           log(`subscriber ${subscriberNumber} redrew with ${cachedSubscriberValue}`, 'fire');
         });
         demoSubscribers.push(stop);
@@ -157,16 +148,18 @@ export function createLabRuntime(view: ViewState<LabViewState>, appDriver: KeyVa
         break;
       }
       case 'write': {
-        const next = withDriver(storeDriver, () => read<number>(STORE_VALUE_KEY, 0) + 1);
-        withDriver(storeDriver, () => write(STORE_VALUE_KEY, next));
+        const valueKey = storeStorage.key(STORE_VALUE_NAME);
+        const next = storeStorage.read<number>(valueKey, 0) + 1;
+        storeStorage.write(valueKey, next);
         notifyCalls += 1;
         log(`store write committed ${next}; notify() follows`, 'ok');
         notify();
         break;
       }
       case 'sneak': {
-        const driverValue = JSON.parse(storeDriver.getItem(STORE_VALUE_KEY) ?? '0') as number;
-        storeDriver.setItem(STORE_VALUE_KEY, JSON.stringify(driverValue + 1));
+        const valueKey = storeStorage.key(STORE_VALUE_NAME);
+        const driverValue = JSON.parse(storeStorage.driver.getItem(valueKey) ?? '0') as number;
+        storeStorage.driver.setItem(valueKey, JSON.stringify(driverValue + 1));
         log('driver changed directly; notify() did not run', 'fail');
         log(`subscriber still shows ${cachedSubscriberValue}, driver contains ${driverValue + 1}`, 'fail');
         break;
@@ -182,13 +175,13 @@ export function createLabRuntime(view: ViewState<LabViewState>, appDriver: KeyVa
       case 'j-supersede': {
         const latest = liveEntries().at(-1);
         if (!latest) { log('record something first', 'fail'); break; }
-        withDriver(appDriver, () => supersede(APP_JOURNAL_KEY, latest.id, {
+        supersede(appStorage, journalKey, latest.id, {
           subjectId: latest.subjectId,
           scope: 'scaffold-lab',
           decision: `${latest.decision} — revised`,
           rationale: 'changed my mind',
           alternatives_rejected: latest.decision,
-        }, () => null, 'lab'));
+        }, () => null, 'lab');
         notify();
         break;
       }
@@ -223,7 +216,7 @@ export function createLabRuntime(view: ViewState<LabViewState>, appDriver: KeyVa
       setText('#p-listeners', String(demoSubscribers.length));
       setText('#p-fires', String(notifyCalls));
       setText('#p-cache', String(cachedSubscriberValue));
-      setText('#p-driver', storeDriver.getItem(STORE_VALUE_KEY) ?? '0');
+      setText('#p-driver', storeStorage.driver.getItem(storeStorage.key(STORE_VALUE_NAME)) ?? '0');
     }
     if (lessonId === 'journal') paintJournal(journal());
     if (lessonId === 'derive') setText('#derive-src', deriveLines.join('\n'));
@@ -279,42 +272,46 @@ export function createLabRuntime(view: ViewState<LabViewState>, appDriver: KeyVa
   };
 }
 
-function seededMigrationDriver(): KeyValueDriver {
-  return memoryDriver({
-    [key('schema_version')]: JSON.stringify(0),
-    [key('profile')]: JSON.stringify({ name: 'Ada Lovelace' }),
-  });
+function seededStoreStorage(): KeyValueStorage {
+  const storage = createStorage({ driver: memoryDriver() });
+  storage.write(storage.key(STORE_VALUE_NAME), 0);
+  return storage;
 }
 
-function migrationsFor(driver: KeyValueDriver, broken: boolean): readonly Migration[] {
-  const profileKey = key('profile');
-  const idsKey = key('profile_ids');
+function seededMigrationStorage(): KeyValueStorage {
+  const storage = createStorage({ driver: memoryDriver() });
+  storage.write(storage.key('schema_version'), 0);
+  storage.write(storage.key('profile'), { name: 'Ada Lovelace' });
+  return storage;
+}
+
+/** Plain numbered steps. Checkpointing means none of them ever runs twice. */
+function migrationsFor(storage: KeyValueStorage, broken: boolean): readonly Migration[] {
+  const profileKey = storage.key('profile');
+  const idsKey = storage.key('profile_ids');
   return [
     { name: '1 add-influence', run(notes) {
-      const profile = JSON.parse(driver.getItem(profileKey) ?? '{}') as Record<string, unknown>;
-      if ('influence' in profile) { notes.push('Step 1 was already present and no-oped.'); return; }
-      driver.setItem(profileKey, JSON.stringify({ ...profile, influence: 'high' }));
+      const profile = storage.read<Record<string, unknown>>(profileKey, {});
+      storage.write(profileKey, { ...profile, influence: 'high' });
       notes.push('Step 1 added influence.');
     } },
     { name: '2 split-name', run(notes) {
       if (broken) throw new Error('Migration 2 intentionally threw.');
-      const profile = JSON.parse(driver.getItem(profileKey) ?? '{}') as Record<string, unknown>;
-      if ('firstName' in profile) { notes.push('Step 2 was already present and no-oped.'); return; }
+      const profile = storage.read<Record<string, unknown>>(profileKey, {});
       const [firstName = '', ...rest] = String(profile.name ?? '').split(' ');
       const { name: _name, ...remaining } = profile;
-      driver.setItem(profileKey, JSON.stringify({ ...remaining, firstName, lastName: rest.join(' ') }));
+      storage.write(profileKey, { ...remaining, firstName, lastName: rest.join(' ') });
       notes.push('Step 2 split the name.');
     } },
     { name: '3 index-ids', run(notes) {
-      if (!driver.getItem(idsKey)) driver.setItem(idsKey, JSON.stringify(['profile-1']));
+      storage.write(idsKey, ['profile-1']);
       notes.push('Step 3 indexed ids.');
     } },
   ];
 }
 
-function readDriverVersion(driver: KeyValueDriver): unknown {
-  const raw = driver.getItem(key('schema_version'));
-  return raw === null ? null : JSON.parse(raw);
+function readVersion(storage: KeyValueStorage): unknown {
+  return storage.read<unknown>(storage.key('schema_version'), null);
 }
 
 function logView(entries: readonly LogEntry[]): string {

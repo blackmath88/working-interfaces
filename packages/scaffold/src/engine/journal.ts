@@ -1,4 +1,5 @@
-import { now, read, uid, write } from './storage.ts';
+import { now, uid } from './storage.ts';
+import type { KeyValueStorage } from './storage.ts';
 
 export interface JournalEntry {
   readonly id: string;
@@ -17,17 +18,18 @@ export type JournalEntryDraft = Omit<JournalEntry, 'id' | 'decided_by' | 'decide
 
 export type AuthorResolver = () => string | null | undefined;
 
-export const getJournal = (storageKey: string): JournalEntry[] =>
-  read<JournalEntry[]>(storageKey, []);
+export const getJournal = (storage: KeyValueStorage, storageKey: string): JournalEntry[] =>
+  storage.read<JournalEntry[]>(storageKey, []);
 
 export function appendEntry(
+  storage: KeyValueStorage,
   storageKey: string,
   entry: JournalEntryDraft,
   resolveAuthor: AuthorResolver,
   fallbackAuthor: string,
 ): JournalEntry | null {
   if (!entry.subjectId) return null;
-  const journal = getJournal(storageKey);
+  const journal = getJournal(storage, storageKey);
   const record: JournalEntry = {
     id: uid(),
     subjectId: entry.subjectId,
@@ -39,16 +41,17 @@ export function appendEntry(
     ...(entry.scope ? { scope: entry.scope } : {}),
     ...(entry.supersedes ? { supersedes: entry.supersedes } : {}),
   };
-  write(storageKey, [...journal, record]);
+  storage.write(storageKey, [...journal, record]);
   return record;
 }
 
 /** Superseding is an append. The superseded entry is never removed. */
 export const supersede = (
+  storage: KeyValueStorage,
   storageKey: string,
   previousId: string,
   entry: Omit<JournalEntryDraft, 'supersedes'>,
   resolveAuthor: AuthorResolver,
   fallbackAuthor: string,
 ): JournalEntry | null =>
-  appendEntry(storageKey, { ...entry, supersedes: previousId }, resolveAuthor, fallbackAuthor);
+  appendEntry(storage, storageKey, { ...entry, supersedes: previousId }, resolveAuthor, fallbackAuthor);

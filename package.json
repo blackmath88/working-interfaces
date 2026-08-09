@@ -3,12 +3,13 @@
   "private": true,
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/*",
+    "experiments/scaffold-lab"
   ],
   "scripts": {
     "dev": "npm --workspace @working-interfaces/field-manual run dev",
     "build": "npm --workspace @working-interfaces/field-manual run build",
-    "build:lab": "npm --prefix experiments/scaffold-lab run build",
+    "build:lab": "npm --workspace @working-interfaces/scaffold-lab run build",
     "check:links": "node scripts/check-links.mjs",
     "check:purity": "node scripts/check-purity.mjs",
     "test": "node --test tests/*.test.mjs packages/scaffold/test/*.test.mjs",

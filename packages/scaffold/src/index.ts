@@ -2,20 +2,20 @@ export { esc, fmt } from './canon/format.ts';
 export {
   CURRENT_SCHEMA_VERSION,
   MIGRATIONS,
-  configureNamespace,
-  getDriver,
-  key,
-  keysWithPrefix,
+  createStorage,
+  localStorageDriver,
   memoryDriver,
-  migrate,
   now,
-  read,
-  remove,
-  setDriver,
   uid,
-  write,
 } from './engine/storage.ts';
-export type { KeyValueDriver, Migration, MigrationReport } from './engine/storage.ts';
+export type {
+  KeyValueDriver,
+  KeyValueStorage,
+  Migration,
+  MigrationFailure,
+  MigrationReport,
+  StorageOptions,
+} from './engine/storage.ts';
 export { notify, subscribe } from './engine/store.ts';
 export { appendEntry, getJournal, supersede } from './engine/journal.ts';
 export type { AuthorResolver, JournalEntry, JournalEntryDraft } from './engine/journal.ts';

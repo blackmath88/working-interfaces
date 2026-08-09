@@ -12,7 +12,9 @@ tokens:
   text.primary:        { note: "decision-relevant content" }
   text.muted:          { note: "metadata and secondary explanation" }
   border.structural:   { note: "planes, tables, persistent divisions" }
+  border.subtle:       { note: "internal divisions within a plane; lighter than structural" }
   focus.primary:       { note: "keyboard and active selection" }
+  text.on-accent:      { note: "text placed on a focus or accent fill" }
   state.settled:       { note: "validated, agreed, or complete" }
   state.uncertain:     { note: "assumed, provisional, unresolved" }
   state.blocked:       { note: "No-Go, blocked, or closed gate" }
@@ -30,7 +32,9 @@ Name colour semantically, by the job it performs. No token is named after a hue.
 - `text.primary` is decision-relevant content. Do not weaken it for visual variety.
 - `text.muted` is metadata and secondary explanation. Do not use it for essential instructions or low-contrast primary content.
 - `border.structural` separates planes, tables, and persistent divisions. Do not use it to add ornamental boxes.
+- `border.subtle` divides content inside one plane: rows in a log, items in a list, a header from the body it belongs to. Do not use it where two planes meet — that boundary is `border.structural`.
 - `focus.primary` identifies keyboard focus and active selection. Do not use colour alone; preserve a visible shape or outline.
+- `text.on-accent` is text placed on a `focus.primary` or accent fill. Do not use it on a plain surface, and do not bind it to a value that fails 4.5:1 against the fill it sits on.
 - `state.settled` marks validated, agreed, or complete states. Do not equate it with generic positivity.
 - `state.uncertain` marks assumed, provisional, or unresolved states. Do not use it for harmless neutral metadata.
 - `state.blocked` marks No-Go, blocked, or closed gates. Do not use it for routine destructive-action styling without the same meaning.

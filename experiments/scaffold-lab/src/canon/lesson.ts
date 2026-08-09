@@ -6,9 +6,9 @@ import { diagramView } from './diagram.ts';
 
 const SNIPPETS: Readonly<Record<string, string>> = {
   domain: `<span class="c">// Nothing happens here. It only declares what exists.</span>\nexport type Stakeholder = {\n  readonly id: string\n  name: string\n  influence: 'low' | 'medium' | 'high'\n}`,
-  storage: `<span class="c">// Numbered steps. Version written only after all succeed.</span>\nconst migrations = [\n  { name: 'add-influence', run: (notes) =&gt; { <span class="c">/* … */</span> } },\n]\n<span class="c">// read() never throws — it returns the fallback instead.</span>\nconst list = read&lt;Stakeholder[]&gt;(key('stakeholders'), [])`,
-  store: `const stop = subscribe(() =&gt; renderEverything())\n\nexport function addStakeholder(s: Stakeholder) {\n  write(key('stakeholders'), [...all(), s])\n  notify()                    <span class="c">// tell every view</span>\n}`,
-  journal: `supersede(previousId, {\n  subjectId: 'vorhaben-04',\n  decision: 'Use the shorter route',\n  rationale: 'The long route failed the No-Go check',\n  alternatives_rejected: 'Keep the long route',\n}, resolveAuthor, 'lab')\n<span class="c">// Both entries remain. Nothing is edited or removed.</span>`,
+  storage: `<span class="c">// Numbered steps. The version is written after each one succeeds.</span>\nconst storage = createStorage({ driver: memoryDriver() })\nconst report = storage.migrate([\n  { name: 'add-influence', run: (notes) =&gt; { <span class="c">/* … */</span> } },\n])\n<span class="c">// report.failed names the step that stopped the run, if any.</span>\nconst list = storage.read&lt;Stakeholder[]&gt;(storage.key('stakeholders'), [])`,
+  store: `const stop = subscribe(() =&gt; renderEverything())\n\nexport function addStakeholder(s: Stakeholder) {\n  storage.write(storage.key('stakeholders'), [...all(), s])\n  notify()                    <span class="c">// tell every view</span>\n}`,
+  journal: `supersede(storage, journalKey, previousId, {\n  subjectId: 'vorhaben-04',\n  decision: 'Use the shorter route',\n  rationale: 'The long route failed the No-Go check',\n  alternatives_rejected: 'Keep the long route',\n}, resolveAuthor, 'lab')\n<span class="c">// Both entries remain. Nothing is edited or removed.</span>`,
   derive: `export function influenceScore(list: Stakeholder[]): number {\n  return list.filter(s =&gt; s.influence === 'high').length * 3\n}\n<span class="c">// const now = Date.now()  ← would fail the build</span>`,
   viewstate: `const view = createViewState({ lesson: 'overview', log: [],\n  demoName: '', panelOpen: false })\nview.set({ panelOpen: true })     <span class="c">// merges, doesn't replace</span>`,
   router: `navigate(['router'], { focus: 's-14' })\n<span class="c">// #/router?focus=s-14</span>\n\nonRouteChange(({ path, params }) =&gt; {\n  view.set({ lesson: path[0], selectedId: params.focus })\n})`,
@@ -30,7 +30,7 @@ function checksView(lessonId: string, got: boolean): string {
   if (!items.length) return '';
   return `<div class="gate"><h3>Did it land?</h3><p class="mono gate-note">Check both, then mark the module understood.</p>
     <div class="checks">${items.map((item) => `<label class="check"><input type="checkbox" data-check="${esc(item.id)}"><span>${esc(item.label)}</span></label>`).join('')}</div>
-    <div class="row"><button class="btn" data-got="${esc(lessonId)}">${got ? 'Understood ✓ — unmark' : 'I understand this module'}</button></div></div>`;
+    <div class="row"><button class="btn${got ? '' : ' btn--p'}" data-got="${esc(lessonId)}">${got ? 'Understood ✓ — unmark' : 'I understand this module'}</button></div></div>`;
 }
 
 function resourcesView(lessonId: string): string {
@@ -55,7 +55,7 @@ export function lessonView({ lesson, got, understood, total, snapshotJson }: Les
   } else if (lesson.id === 'rules') {
     body += `<div class="gate"><h3>Dependencies point downward</h3><p>Domain knows nothing. Engine may use domain. Canon may use domain but never engine. Shell may use all three.</p></div><div class="gate gate-blocked"><h3>Everything goes through the store</h3><p>A direct write leaves subscribers stale; the store demo makes that disagreement visible.</p></div><div class="gate"><h3>Corrections are additions</h3><p>Nothing recorded is rewritten or removed. A correction appends and points at what it replaces.</p></div><h2>A rule nobody checks is a suggestion</h2><p>The purity guard, subscription boundary, and absent journal delete operation make these rules executable.</p>`;
   } else if (lesson.id === 'export') {
-    body += `<div class="lab"><div class="lab-h"><span class="t">Snapshot</span><span class="s">${fmt(understood)} of ${fmt(total)} modules marked understood</span></div><div class="lab-b"><div class="row"><button class="btn" data-demo="copy">Copy JSON</button><button class="btn" data-demo="download">Download</button></div><pre id="json">${esc(snapshotJson)}</pre><p class="warnline">No browser storage — closing the tab discards everything. Copy before closing.</p></div></div><h2>Why there is no save button</h2><p>Storage brings migrations and versioning. Exporting keeps that decision visible and produces a portable file.</p>`;
+    body += `<div class="lab"><div class="lab-h"><span class="t">Snapshot</span><span class="s">${fmt(understood)} of ${fmt(total)} modules marked understood</span></div><div class="lab-b"><div class="row"><button class="btn btn--p" data-demo="copy">Copy JSON</button><button class="btn" data-demo="download">Download</button></div><pre id="json">${esc(snapshotJson)}</pre><p class="warnline">No browser storage — closing the tab discards everything. Copy before closing.</p></div></div><h2>Why there is no save button</h2><p>Storage brings migrations and versioning. Exporting keeps that decision visible and produces a portable file.</p>`;
   } else {
     const snippet = SNIPPETS[lesson.id];
     if (snippet) body += `<pre><code>${snippet}</code></pre>`;

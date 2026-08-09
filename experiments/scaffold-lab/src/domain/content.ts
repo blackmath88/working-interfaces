@@ -17,7 +17,7 @@ export const LESSONS: readonly Lesson[] = [
 
 const labels: Record<string, readonly string[]> = {
   domain: ['A type declares what exists, it does not do anything', 'Domain may not import from engine, canon, or shell'],
-  storage: ['Only one module in a project touches storage', 'The schema version is written after all migrations succeed, never during'],
+  storage: ['Only one module in a project touches storage', 'The schema version is checkpointed after each migration, so no step ever runs twice'],
   store: ['Views never save directly — every change goes through the store', 'subscribe returns the function that stops listening'],
   journal: ['Superseding appends; the old entry is never edited or removed', 'The history shows both what was decided and what replaced it'],
   derive: ['Same input, same output, always', 'No clock, no randomness, no storage, no network'],

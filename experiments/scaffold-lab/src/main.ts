@@ -1,10 +1,10 @@
 import {
+  createStorage,
   createViewState,
   deserialize,
   memoryDriver,
   navigate,
   onRouteChange,
-  setDriver,
   subscribe,
 } from '@working-interfaces/scaffold';
 import { LESSONS } from './domain/content.ts';
@@ -16,8 +16,7 @@ import './styles/lab.css';
 const root = document.querySelector<HTMLElement>('#app');
 if (!root) throw new Error('The scaffold lab needs an #app mount point.');
 
-const appDriver = memoryDriver();
-setDriver(appDriver);
+const appStorage = createStorage({ driver: memoryDriver() });
 
 const view = createViewState<LabViewState>({
   lesson: 'overview',
@@ -25,7 +24,7 @@ const view = createViewState<LabViewState>({
   demoName: '',
   panelOpen: false,
 });
-const runtime = createLabRuntime(view, appDriver);
+const runtime = createLabRuntime(view, appStorage);
 const shell = mountShell(root, runtime);
 
 window.addEventListener('lab:navigate', ((event: CustomEvent<{ path: string[]; params: Record<string, string> }>) => {
