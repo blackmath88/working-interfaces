@@ -6,7 +6,7 @@ kind: pattern
 revision: 1
 summary: A framework-free floor for domain-driven prototypes with explicit state and rendering boundaries.
 related: []
-implementation: { html: "packages/scaffold", status: "experimental" }
+implementation: { html: "experiments/scaffold-lab", status: "experimental" }
 ---
 
 ## Layering
@@ -20,6 +20,8 @@ Dependencies flow in one direction:
 - Views and pages mount strings and bind behaviour.
 
 The scaffold does not provide a domain model or shell markup. Those remain local until repeated implementations prove a shared form.
+
+The scaffold now has a working consumer in `experiments/scaffold-lab`, ported from the preserved single-file study.
 
 ## Domain state and view state
 

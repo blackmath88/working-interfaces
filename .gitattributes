@@ -1,0 +1,6 @@
+knowledge/foundations/*.md text eol=lf
+knowledge/styles/*.md text eol=lf
+knowledge/patterns/architecture/scaffold.md text eol=lf
+apps/field-manual/public/downloads/knowledge/foundations/*.md text eol=lf
+apps/field-manual/public/downloads/knowledge/styles/*.md text eol=lf
+apps/field-manual/public/downloads/knowledge/patterns/architecture/scaffold.md text eol=lf

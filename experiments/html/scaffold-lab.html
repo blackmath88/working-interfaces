@@ -1,0 +1,831 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scaffold Lab — Working Interfaces</title>
+<style>
+:root {
+  color-scheme: light;
+  --paper: oklch(.965 .008 92); --sunk: oklch(.93 .012 92); --white: oklch(.99 .004 92);
+  --ink: oklch(.19 .012 300); --soft: oklch(.45 .011 92);
+  --acc: oklch(.46 .095 200);
+  --pos: oklch(.46 .095 155);
+  --neg: oklch(.55 .18 27);
+  --warn: oklch(.62 .13 75);
+  --rule: color-mix(in oklab, var(--ink) 26%, transparent);
+  --faint: color-mix(in oklab, var(--ink) 13%, transparent);
+  --dur-fast: 140ms; --ease: cubic-bezier(.2,.8,.2,1);
+}
+@media (prefers-reduced-motion: reduce) { :root { --dur-fast: 1ms; } }
+* { box-sizing: border-box; margin: 0; }
+body { background: var(--paper); color: var(--ink);
+  font: 400 14px/1.6 system-ui, sans-serif; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; text-align: left; }
+:is(button,a,input,textarea):focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; }
+code { font: 400 .88em/1.5 ui-monospace, monospace; background: var(--sunk); padding: 1px 5px; }
+pre { padding: 13px 15px; background: var(--sunk); border: 1px solid var(--faint);
+  overflow-x: auto; font: 400 12px/1.65 ui-monospace, monospace; margin-top: 12px; }
+pre code { background: none; padding: 0; }
+.c { color: var(--soft); }
+.mono { font: 400 11px/1.5 ui-monospace, monospace; letter-spacing: .02em; }
+
+/* ── shell: the frame, rendered once ───────────────────────── */
+.app { display: grid; grid-template-columns: 250px 1fr; min-height: 100vh; }
+.rail { border-right: 1px solid var(--rule); padding: 26px 0 40px;
+  position: sticky; top: 0; align-self: start; max-height: 100vh; overflow-y: auto; }
+.rail-h { padding: 0 22px 16px; border-bottom: 1px solid var(--faint); }
+.brand { font: 600 10px/1 ui-monospace, monospace; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--soft); }
+.brand-t { font-family: Georgia, serif; font-size: 19px; font-weight: 700;
+  letter-spacing: -.015em; margin-top: 7px; }
+.nav-sec { margin-top: 18px; }
+.nav-sec-h { padding: 0 22px 7px; font: 600 9.5px/1 ui-monospace, monospace;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--soft); }
+.nav-i { display: flex; align-items: center; gap: 9px; width: 100%;
+  padding: 8px 22px; border-left: 2px solid transparent;
+  transition: background var(--dur-fast) var(--ease); }
+.nav-i:hover { background: var(--sunk); }
+.nav-i[aria-current="page"] { border-left-color: var(--ink); background: var(--sunk); font-weight: 600; }
+.dot { width: 7px; height: 7px; flex: none; border: 1px solid var(--rule); border-radius: 50%; }
+.dot[data-got] { background: var(--pos); border-color: var(--pos); }
+.nav-i .lbl { flex: 1; font-size: 13px; }
+.nav-i .lyr { font: 400 9px/1 ui-monospace, monospace; color: var(--soft);
+  letter-spacing: .08em; text-transform: uppercase; }
+
+.main { min-width: 0; }
+.urlbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 10px 34px; border-bottom: 1px solid var(--faint); background: var(--white);
+  position: sticky; top: 0; z-index: 5; }
+.urlbar .k { font: 600 9px/1 ui-monospace, monospace; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--soft); }
+.urlbar .v { font: 500 12px/1 ui-monospace, monospace; color: var(--acc); }
+.urlbar .nb { padding: 4px 9px; border: 1px solid var(--rule);
+  font: 500 11px/1 ui-monospace, monospace; }
+.urlbar .nb:hover { background: var(--sunk); }
+.urlbar .layer { margin-left: auto; font: 500 11px/1 ui-monospace, monospace; color: var(--soft); }
+
+.page { padding: 34px 34px 90px; max-width: 860px; }
+h1 { font-family: Georgia, serif; font-size: 30px; font-weight: 700;
+  letter-spacing: -.02em; line-height: 1.15; }
+h2 { font-family: Georgia, serif; font-size: 21px; font-weight: 700;
+  letter-spacing: -.014em; margin-top: 34px; }
+h3 { font-family: Georgia, serif; font-size: 16px; font-weight: 700; }
+p { margin-top: 12px; max-width: 66ch; }
+p.lead { margin-top: 12px; color: var(--soft); font-size: 15px; }
+.kicker { font: 600 10px/1 ui-monospace, monospace; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--soft); margin-bottom: 11px; }
+.file { font: 500 11px/1 ui-monospace, monospace; color: var(--soft); letter-spacing: .04em; }
+.metaphor { margin-top: 16px; padding-left: 13px; border-left: 2px solid var(--faint);
+  font-family: Georgia, serif; font-style: italic; font-size: 15px; }
+
+.lab { margin-top: 22px; border: 1px solid var(--rule); background: var(--white); }
+.lab-h { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
+  padding: 11px 17px; border-bottom: 1px solid var(--faint); background: var(--sunk); }
+.lab-h .t { font: 600 10px/1 ui-monospace, monospace; letter-spacing: .13em;
+  text-transform: uppercase; }
+.lab-h .s { font-size: 12px; color: var(--soft); }
+.lab-b { padding: 17px; }
+.row { display: flex; gap: 9px; align-items: center; flex-wrap: wrap; }
+.btn { padding: 7px 13px; border: 1px solid var(--ink); font-size: 12.5px; font-weight: 600;
+  transition: background var(--dur-fast) var(--ease); }
+.btn:hover { background: var(--ink); color: var(--paper); }
+.btn--p { background: var(--ink); color: var(--paper); }
+.btn--p:hover { background: none; color: var(--ink); }
+.btn--d { border-color: var(--neg); color: var(--neg); }
+.btn--d:hover { background: var(--neg); color: var(--white); }
+input[type=text] { padding: 7px 10px; border: 1px solid var(--rule); background: var(--white);
+  font: inherit; font-size: 13px; min-width: 0; flex: 1; border-radius: 0; }
+
+.log { margin-top: 13px; border: 1px solid var(--faint); background: var(--sunk);
+  max-height: 210px; overflow-y: auto; }
+.log-e { padding: 7px 12px; border-bottom: 1px solid var(--faint);
+  font: 400 11.5px/1.5 ui-monospace, monospace; display: flex; gap: 10px; }
+.log-e:last-child { border-bottom: 0; }
+.log-e .n { color: var(--soft); flex: none; }
+.log-e[data-k="fire"] .m { color: var(--acc); }
+.log-e[data-k="fail"] .m { color: var(--neg); }
+.log-e[data-k="ok"] .m { color: var(--pos); }
+.empty { padding: 15px 12px; font-size: 12px; color: var(--soft); font-style: italic; }
+
+.entry { padding: 12px 14px; border: 1px solid var(--faint); background: var(--sunk); margin-top: 9px; }
+.entry[data-dead] { opacity: .62; border-style: dashed; }
+.entry-h { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.entry-id { font: 500 10px/1 ui-monospace, monospace; color: var(--soft); letter-spacing: .06em; }
+.entry-d { font-weight: 600; font-size: 13.5px; }
+.entry-m { margin-top: 5px; font-size: 12px; color: var(--soft); }
+.tag { padding: 2px 7px; font: 600 9px/1.4 ui-monospace, monospace;
+  letter-spacing: .08em; text-transform: uppercase; border: 1px solid var(--rule); }
+.tag[data-t="dead"] { border-color: var(--neg); color: var(--neg); }
+.tag[data-t="live"] { border-color: var(--pos); color: var(--pos); }
+.tag[data-t="view"] { border-color: var(--warn); color: var(--warn); }
+
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 13px; }
+.pane { border: 1px solid var(--faint); padding: 13px; background: var(--sunk); }
+.pane-h { font: 600 9.5px/1 ui-monospace, monospace; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--soft); margin-bottom: 9px; }
+.pane-v { font: 500 13px/1.5 ui-monospace, monospace; word-break: break-all; }
+
+.check { display: flex; gap: 9px; align-items: flex-start; padding: 9px 0;
+  border-bottom: 1px solid var(--faint); font-size: 13px; }
+.check:last-child { border-bottom: 0; }
+.check input { margin-top: 4px; flex: none; accent-color: var(--acc); }
+
+.gate { margin-top: 30px; padding: 18px 20px; border: 1px solid var(--rule);
+  border-left: 3px solid var(--acc); }
+.gate h3 { margin-bottom: 3px; }
+.gate .row { margin-top: 13px; }
+
+.links { margin-top: 8px; }
+.link { padding: 11px 0; border-bottom: 1px solid var(--faint); }
+.link a { color: var(--acc); font-weight: 600; text-underline-offset: 3px; font-size: 13.5px; }
+.link p { margin-top: 3px; font-size: 12.5px; color: var(--soft); }
+
+.diagram { margin-top: 20px; padding: 16px 6px; border: 1px solid var(--faint); background: var(--white); }
+.diagram svg { display: block; width: 100%; height: auto; }
+.dgf { fill: color-mix(in oklab, var(--ink) 4%, transparent); }
+.dgf2 { fill: color-mix(in oklab, var(--acc) 9%, transparent); }
+.dgs { stroke: var(--rule); }
+.dgt { fill: var(--ink); font: 600 12.5px ui-monospace, monospace; }
+.dgd { fill: var(--soft); font: 400 11px system-ui, sans-serif; }
+.dga { stroke: var(--ink); stroke-width: 1; fill: none; }
+.dg-node { cursor: pointer; }
+.dg-node:hover .dgf { fill: color-mix(in oklab, var(--acc) 16%, transparent); }
+.dg-node[data-here] .dgf { fill: color-mix(in oklab, var(--acc) 20%, transparent); }
+
+pre#json { max-height: 300px; overflow: auto; white-space: pre-wrap; word-break: break-word; }
+.warnline { margin-top: 10px; font-size: 12px; color: var(--neg); }
+
+@media (max-width: 820px) {
+  .app { grid-template-columns: 1fr; }
+  .rail { position: static; max-height: none; border-right: 0; border-bottom: 1px solid var(--rule); }
+  .page { padding: 24px 20px 70px; }
+  .urlbar { padding: 10px 20px; }
+  .split { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="Modules">
+    <div class="rail-h">
+      <div class="brand">Working Interfaces · Lab</div>
+      <div class="brand-t">Scaffold Lab</div>
+    </div>
+    <div id="nav"></div>
+  </nav>
+  <main class="main">
+    <div class="urlbar">
+      <span class="k">url</span>
+      <span class="v" id="url">#/</span>
+      <button class="nb" type="button" onclick="history.back()">← back</button>
+      <button class="nb" type="button" onclick="history.forward()">forward →</button>
+      <span class="layer" id="layer"></span>
+    </div>
+    <div class="page" id="page"></div>
+  </main>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   This file is built the way it describes. The layer comments
+   below are not decoration — the code respects them.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── domain: the nouns. Knows nothing, does nothing. ────────── */
+
+const LESSONS = [
+  { id: 'overview', title: 'The shape', layer: '—', file: 'read me first',
+    metaphor: 'A workshop with four rooms and strict rules about doors.',
+    lead: 'Every module below lives in one of four layers. Each layer may only depend on the ones beneath it — that single rule is what makes the rest work.' },
+
+  { id: 'domain', title: 'domain', layer: 'domain', file: 'src/domain/types.ts',
+    metaphor: 'Vocabulary painted on the wall.',
+    lead: 'A list of the nouns your project deals with. No behaviour, no logic — the shortest file and often the most consequential, because naming badly here makes everything downstream awkward.' },
+
+  { id: 'storage', title: 'storage', layer: 'engine', file: 'engine/storage.ts',
+    metaphor: 'The filing cabinet in the basement.',
+    lead: 'The only module allowed to touch browser storage. Its real work is migrations: numbered steps that upgrade data saved by an older version of your app.' },
+
+  { id: 'store', title: 'store', layer: 'engine', file: 'engine/store.ts',
+    metaphor: 'The front desk everything passes through.',
+    lead: 'Every change goes through here, and when something changes it announces it so the screen can redraw. Genuinely just a list of listeners and two functions.' },
+
+  { id: 'journal', title: 'journal', layer: 'engine', file: 'engine/journal.ts',
+    metaphor: 'A minute book — struck through, never torn out.',
+    lead: 'Records decisions and never erases. Change your mind and it appends a new entry pointing at the old one, which stays visible forever. A belief expressed as code.' },
+
+  { id: 'derive', title: 'derive', layer: 'engine', file: 'engine/derive.ts',
+    metaphor: 'The accountant, who may only read.',
+    lead: 'Calculations only. Forbidden from saving, fetching, reading the clock, or using randomness — and the ban is enforced by a script that fails the build.' },
+
+  { id: 'viewstate', title: 'view-state', layer: 'engine', file: 'engine/view-state.ts',
+    metaphor: 'Where you are standing and what you are looking at.',
+    lead: 'Camera position, open panels, current selection. Facts about your glance, not about your project. Confusing these with domain state is how apps slowly become incoherent.' },
+
+  { id: 'router', title: 'router', layer: 'engine', file: 'engine/router.ts',
+    metaphor: 'The address on the envelope.',
+    lead: 'Makes the back button work and lets you share a link that opens the same view. The bar at the top of this page is reading it live.' },
+
+  { id: 'canon', title: 'canon', layer: 'canon', file: 'canon/format.ts',
+    metaphor: 'The printing press.',
+    lead: 'Turns data into markup. Cannot save, fetch, or handle a click. That restriction is why a styleguide can render every component with no project loaded.' },
+
+  { id: 'rules', title: 'The three rules', layer: '—', file: 'the whole point',
+    metaphor: 'A rule nobody checks is a suggestion.',
+    lead: 'Everything above collapses into three rules. If you remember nothing else from this lab, remember these.' },
+
+  { id: 'export', title: 'Your progress', layer: '—', file: 'export',
+    metaphor: 'Nothing here is saved. That is deliberate.',
+    lead: 'This prototype has no browser storage, following the house pattern: state lives in memory, and you export it when you want it to survive.' }
+];
+
+const CHECKS = {
+  domain: ['A type declares what exists, it does not do anything',
+           'Domain may not import from engine, canon, or shell'],
+  storage: ['Only one module in a project touches storage',
+            'The schema version is written after all migrations succeed, never during'],
+  store: ['Views never save directly — every change goes through the store',
+          'subscribe returns the function that stops listening'],
+  journal: ['Superseding appends; the old entry is never edited or removed',
+            'The history shows both what was decided and what replaced it'],
+  derive: ['Same input, same output, always',
+           'No clock, no randomness, no storage, no network'],
+  viewstate: ['View state is not journaled and not migrated',
+              'If you would not want it in a history log, it is view state'],
+  router: ['The URL is a view of view-state, not of domain state',
+           'Back and forward should never lose domain data'],
+  canon: ['Given the same data, canon produces the same markup',
+          'User text is escaped before it reaches the page']
+};
+
+/* ── engine/storage: the only place that would touch storage.
+   This prototype deliberately has none — see the export lesson. */
+
+/* ── engine/store: domain state + the announcement mechanism ── */
+
+const store = (() => {
+  let got = {};                 // lessonId -> true        (domain state)
+  let journal = [];             // append-only, never spliced
+  let seq = 1;
+  const listeners = new Set();
+  let fires = 0;
+
+  return {
+    subscribe(fn) { listeners.add(fn); return () => listeners.delete(fn); },
+    notify() { fires++; listeners.forEach(fn => fn()); },
+    listenerCount: () => listeners.size,
+    fireCount: () => fires,
+
+    got: () => ({ ...got }),
+    hasGot: id => !!got[id],
+    setGot(id, v) { v ? got[id] = true : delete got[id]; this.notify(); },
+
+    journal: () => journal.slice(),
+    append(entry) {
+      const rec = Object.freeze({ id: 'e' + (seq++), at: new Date().toISOString(), ...entry });
+      journal = [...journal, rec];          // append. never splice, never edit.
+      this.notify();
+      return rec;
+    },
+    supersede(prevId, entry) {
+      return this.append({ ...entry, supersedes: prevId });
+    },
+    supersededIds: () => new Set(journal.map(e => e.supersedes).filter(Boolean))
+  };
+})();
+
+/* ── engine/view-state: ephemeral. Never journaled, never saved ─ */
+
+const view = (() => {
+  let s = { lesson: 'overview', log: [], demoName: '', panelOpen: false };
+  const listeners = new Set();
+  return {
+    get: () => ({ ...s }),
+    set(patch) { s = { ...s, ...patch }; listeners.forEach(fn => fn()); },
+    subscribe(fn) { listeners.add(fn); return () => listeners.delete(fn); },
+    log(msg, kind) {
+      s = { ...s, log: [...s.log, { n: s.log.length + 1, msg, kind }].slice(-40) };
+      listeners.forEach(fn => fn());
+    },
+    clearLog() { this.set({ log: [] }); }
+  };
+})();
+
+/* ── engine/derive: pure. No clock, no storage, no randomness. ─ */
+
+function progress(gotMap, lessons) {
+  const teachable = lessons.filter(l => CHECKS[l.id]);
+  const done = teachable.filter(l => gotMap[l.id]).length;
+  return { done, total: teachable.length };
+}
+
+function liveEntries(journal) {
+  const dead = new Set(journal.map(e => e.supersedes).filter(Boolean));
+  return journal.filter(e => !dead.has(e.id));
+}
+
+function lessonById(id) { return LESSONS.find(l => l.id === id) || LESSONS[0]; }
+
+/* ── engine/router: hash only. Shareable, back-button-safe. ──── */
+
+const router = {
+  parse() {
+    const raw = location.hash.replace(/^#\/?/, '');
+    const [p, q] = raw.split('?');
+    const params = {};
+    new URLSearchParams(q || '').forEach((v, k) => params[k] = v);
+    return { path: p ? p.split('/').filter(Boolean) : [], params };
+  },
+  navigate(path, params = {}) {
+    const q = new URLSearchParams(params).toString();
+    location.hash = '/' + path.join('/') + (q ? '?' + q : '');
+  },
+  onChange(fn) { addEventListener('hashchange', fn); return () => removeEventListener('hashchange', fn); }
+};
+
+/* ── canon: pure string builders. No events, no storage. ─────── */
+
+const esc = s => String(s).replace(/[&<>"']/g, c =>
+  ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+
+function navItem(l, current, got) {
+  return `<button class="nav-i" data-nav="${l.id}" ${l.id === current ? 'aria-current="page"' : ''}>
+    <span class="dot" ${got[l.id] ? 'data-got' : ''}></span>
+    <span class="lbl">${esc(l.title)}</span>
+    <span class="lyr">${esc(l.layer)}</span>
+  </button>`;
+}
+
+function logView(entries) {
+  if (!entries.length) return `<div class="log"><div class="empty">Nothing yet — press a button above.</div></div>`;
+  return `<div class="log">${entries.map(e =>
+    `<div class="log-e" data-k="${esc(e.kind || '')}"><span class="n">${e.n}</span><span class="m">${esc(e.msg)}</span></div>`
+  ).join('')}</div>`;
+}
+
+function entryView(e, dead) {
+  return `<div class="entry" ${dead ? 'data-dead' : ''}>
+    <div class="entry-h">
+      <span class="entry-id">${esc(e.id)}</span>
+      <span class="entry-d">${esc(e.decision)}</span>
+      <span class="tag" data-t="${dead ? 'dead' : 'live'}">${dead ? 'superseded' : 'current'}</span>
+    </div>
+    <div class="entry-m">${esc(e.rationale || '')}${e.supersedes ? ` · replaces <code>${esc(e.supersedes)}</code>` : ''}</div>
+  </div>`;
+}
+
+function checksView(id, got) {
+  const items = CHECKS[id];
+  if (!items) return '';
+  return `<div class="gate">
+    <h3>Did it land?</h3>
+    <p class="mono" style="color:var(--soft);margin-top:4px">Check both, then mark the module understood.</p>
+    <div style="margin-top:11px">${items.map((t, i) =>
+      `<label class="check"><input type="checkbox" data-check="${id}-${i}"><span>${esc(t)}</span></label>`).join('')}</div>
+    <div class="row">
+      <button class="btn ${got ? '' : 'btn--p'}" data-got="${id}">${got ? 'Understood ✓ — unmark' : 'I understand this module'}</button>
+    </div>
+  </div>`;
+}
+
+function diagram(here) {
+  const box = (id, x, y, w, t, d) => `<g class="dg-node" data-nav="${id}" ${here === id ? 'data-here' : ''}>
+    <rect class="dgf dgs" x="${x}" y="${y}" width="${w}" height="58"/>
+    <text class="dgt" x="${x + w/2}" y="${y + 24}" text-anchor="middle">${t}</text>
+    <text class="dgd" x="${x + w/2}" y="${y + 43}" text-anchor="middle">${d}</text></g>`;
+  return `<div class="diagram"><svg viewBox="0 0 700 470" role="img" aria-label="Four layers with arrows pointing downward">
+    <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+    <rect class="dgf dgs" x="30" y="20" width="640" height="52"/>
+    <text class="dgt" x="350" y="43" text-anchor="middle">shell / views</text>
+    <text class="dgd" x="350" y="61" text-anchor="middle">puts things on screen, wires up buttons</text>
+    <line class="dga" x1="350" y1="72" x2="350" y2="96" marker-end="url(#a)"/>
+    ${box('canon', 30, 96, 640, 'canon', 'turns data into markup, nothing else')}
+    <line class="dga" x1="350" y1="154" x2="350" y2="178" marker-end="url(#a)"/>
+    <rect class="dgf2 dgs" x="30" y="178" width="640" height="186"/>
+    <text class="dgt" x="48" y="201">engine</text>
+    ${box('storage', 46, 214, 196, 'storage', 'saves, upgrades old data')}
+    ${box('store', 252, 214, 196, 'store', 'one door for changes')}
+    ${box('journal', 458, 214, 196, 'journal', 'records, never erases')}
+    ${box('derive', 46, 286, 196, 'derive', 'calculations only')}
+    ${box('viewstate', 252, 286, 196, 'view-state', 'where you are looking')}
+    ${box('router', 458, 286, 196, 'router', 'back button, links')}
+    <line class="dga" x1="350" y1="364" x2="350" y2="388" marker-end="url(#a)"/>
+    ${box('domain', 30, 388, 640, 'domain', 'the nouns, per project, knows nothing')}
+  </svg></div>`;
+}
+
+/* ── views: mount strings, bind behaviour. ──────────────────── */
+
+const DEMOS = {
+
+storage: () => `<div class="lab">
+  <div class="lab-h"><span class="t">Try it</span><span class="s">Run migrations against data from an older version</span></div>
+  <div class="lab-b">
+    <div class="row">
+      <button class="btn" data-demo="mig-ok">Run migrations 1 → 3</button>
+      <button class="btn btn--d" data-demo="mig-fail">Run with migration 2 broken</button>
+      <button class="btn" data-demo="clear">Clear</button>
+    </div>
+    <p class="mono" style="margin-top:11px;color:var(--soft)">Watch what the stored version says after a failure.</p>
+    <div id="demo-out"></div>
+  </div></div>`,
+
+store: () => `<div class="lab">
+  <div class="lab-h"><span class="t">Try it</span><span class="s">Two views subscribe; one write wakes both</span></div>
+  <div class="lab-b">
+    <div class="row">
+      <button class="btn" data-demo="sub">Add a listener</button>
+      <button class="btn" data-demo="write">Write through the store</button>
+      <button class="btn btn--d" data-demo="sneak">Save directly (skip the store)</button>
+      <button class="btn" data-demo="clear">Clear</button>
+    </div>
+    <div class="split">
+      <div class="pane"><div class="pane-h">listeners</div><div class="pane-v" id="p-listeners">0</div></div>
+      <div class="pane"><div class="pane-h">notify() calls</div><div class="pane-v" id="p-fires">0</div></div>
+    </div>
+    <div id="demo-out"></div>
+  </div></div>`,
+
+journal: () => `<div class="lab">
+  <div class="lab-h"><span class="t">Try it</span><span class="s">Change your mind and watch nothing disappear</span></div>
+  <div class="lab-b">
+    <div class="row">
+      <input type="text" id="dec" placeholder="A decision, e.g. Use the shorter route" maxlength="90">
+      <button class="btn btn--p" data-demo="j-add">Record</button>
+    </div>
+    <div class="row" style="margin-top:9px">
+      <button class="btn" data-demo="j-supersede">Change my mind about the latest</button>
+      <button class="btn btn--d" data-demo="j-delete">Delete an entry</button>
+    </div>
+    <div id="j-list"></div>
+  </div></div>`,
+
+derive: () => `<div class="lab">
+  <div class="lab-h"><span class="t">Try it</span><span class="s">Write a line into derive.ts and let the inspector look at it</span></div>
+  <div class="lab-b">
+    <div class="row">
+      <button class="btn" data-demo="pure">Add a pure line</button>
+      <button class="btn btn--d" data-demo="clock">Add <code>Date.now()</code></button>
+      <button class="btn btn--d" data-demo="rand">Add <code>Math.random()</code></button>
+      <button class="btn btn--d" data-demo="ls">Add <code>localStorage</code></button>
+      <button class="btn" data-demo="clear">Reset file</button>
+    </div>
+    <pre id="derive-src"></pre>
+    <div id="demo-out"></div>
+  </div></div>`,
+
+viewstate: () => `<div class="lab">
+  <div class="lab-h"><span class="t">Try it</span><span class="s">One of these survives navigation. One does not.</span></div>
+  <div class="lab-b">
+    <div class="split">
+      <div class="pane">
+        <div class="pane-h">domain state — the store</div>
+        <div class="pane-v" id="p-dom">—</div>
+        <div class="row" style="margin-top:11px"><button class="btn" data-demo="vs-dom">Set a name</button></div>
+      </div>
+      <div class="pane">
+        <div class="pane-h">view state <span class="tag" data-t="view">ephemeral</span></div>
+        <div class="pane-v" id="p-view">closed</div>
+        <div class="row" style="margin-top:11px"><button class="btn" data-demo="vs-view">Toggle the panel</button></div>
+      </div>
+    </div>
+    <p class="mono" style="margin-top:13px;color:var(--soft)">Set both, click another module in the sidebar, then come back.</p>
+  </div></div>`,
+
+router: () => `<div class="lab">
+  <div class="lab-h"><span class="t">Try it</span><span class="s">The bar at the top of this page is the router</span></div>
+  <div class="lab-b">
+    <div class="row">
+      <button class="btn" data-demo="r-focus">Put a selection in the URL</button>
+      <button class="btn" data-demo="r-clear">Remove it</button>
+      <button class="btn" data-demo="r-jump">Jump to the journal lesson</button>
+    </div>
+    <p class="mono" style="margin-top:12px;color:var(--soft)">Then press back. The router restores the view; nothing in the store was ever at risk.</p>
+    <div class="split">
+      <div class="pane"><div class="pane-h">path</div><div class="pane-v" id="p-path">—</div></div>
+      <div class="pane"><div class="pane-h">params</div><div class="pane-v" id="p-params">—</div></div>
+    </div>
+  </div></div>`,
+
+canon: () => `<div class="lab">
+  <div class="lab-h"><span class="t">Try it</span><span class="s">Someone is named &lt;script&gt;. What happens?</span></div>
+  <div class="lab-b">
+    <div class="row">
+      <input type="text" id="uname" placeholder="Try: &lt;b&gt;bold&lt;/b&gt; or &lt;img src=x onerror=alert(1)&gt;" maxlength="80">
+    </div>
+    <div class="split">
+      <div class="pane"><div class="pane-h">with esc() — canon's rule</div><div class="pane-v" id="p-safe">—</div></div>
+      <div class="pane"><div class="pane-h">raw — what happens without it</div><div class="pane-v" id="p-raw">—</div></div>
+    </div>
+    <p class="mono" style="margin-top:12px;color:var(--soft)">The right pane renders your input as HTML. That is the whole attack.</p>
+  </div></div>`
+};
+
+const SNIPPETS = {
+domain: `<span class="c">// Nothing happens here. It only declares what exists.</span>
+export type Stakeholder = {
+  readonly id: string
+  name: string
+  influence: 'low' | 'medium' | 'high'
+}`,
+storage: `<span class="c">// Numbered steps. Version written only after all succeed.</span>
+const MIGRATIONS = [
+  { name: 'add-influence', run: (notes) =&gt; { <span class="c">/* … */</span> } },
+]
+<span class="c">// read() never throws — it returns the fallback instead.</span>
+const list = read&lt;Stakeholder[]&gt;(key('stakeholders'), [])`,
+store: `const stop = subscribe(() =&gt; renderEverything())
+
+export function addStakeholder(s: Stakeholder) {
+  write(key('stakeholders'), [...all(), s])
+  notify()                    <span class="c">// tell every view</span>
+}`,
+journal: `supersede(previousId, {
+  subjectId: 'vorhaben-04',
+  decision: 'Use the shorter route',
+  rationale: 'The long route failed the No-Go check',
+})
+<span class="c">// Both entries remain. Nothing is edited or removed.</span>`,
+derive: `export function influenceScore(list: Stakeholder[]): number {
+  return list.filter(s =&gt; s.influence === 'high').length * 3
+}
+<span class="c">// const now = Date.now()  ← would fail the build</span>`,
+viewstate: `const view = createViewState({ selectedId: null, panelOpen: false })
+view.set({ panelOpen: true })     <span class="c">// merges, doesn't replace</span>
+
+<span class="c">// high-influence stakeholder → store</span>
+<span class="c">// that stakeholder is selected → here</span>`,
+router: `navigate(['stakeholders'], { focus: 's-14' })   <span class="c">// #/stakeholders?focus=s-14</span>
+
+onRouteChange(({ path, params }) =&gt; {
+  view.set({ selectedId: params.focus ?? null })
+})`,
+canon: `export function stakeholderCard(s: Stakeholder): string {
+  return \`&lt;article&gt;&lt;h3&gt;\${esc(s.name)}&lt;/h3&gt;&lt;/article&gt;\`
+}
+<span class="c">// The click handler lives in the view, not here.</span>`
+};
+
+const RESOURCES = {
+  domain: [['TypeScript: everyday types','https://www.typescriptlang.org/docs/handbook/2/everyday-types.html','Covers most of what a types file ever needs.']],
+  storage: [['Web Storage API','https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API','What this wraps — worth knowing its limits.'],
+            ['Schema migrations','https://martinfowler.com/bliki/DatabaseMigration.html','Where the numbered-step idea comes from.']],
+  store: [['The observer pattern','https://refactoring.guru/design-patterns/observer','subscribe and notify, by its proper name.']],
+  journal: [['Event sourcing','https://martinfowler.com/eaaDev/EventSourcing.html','The grown-up version: store changes, derive the present.']],
+  derive: [['Pure functions','https://en.wikipedia.org/wiki/Pure_function','The property the purity check enforces.'],
+           ['Hexagonal architecture','https://alistair.cockburn.us/hexagonal-architecture/','Why the layers point the way they do.']],
+  router: [['History API','https://developer.mozilla.org/en-US/docs/Web/API/History_API','The machinery behind the back button.']],
+  canon: [['Cross-site scripting','https://owasp.org/www-community/attacks/xss/','Why esc() exists. Short, and it makes the habit stick.']]
+};
+
+/* ── shell: rendered once, then patched ─────────────────────── */
+
+let deriveLines = ['export function score(list) {', '  return list.length * 3', '}'];
+
+function renderNav() {
+  const v = view.get(), got = store.got();
+  document.getElementById('nav').innerHTML = `
+    <div class="nav-sec"><div class="nav-sec-h">Start</div>${navItem(LESSONS[0], v.lesson, got)}</div>
+    <div class="nav-sec"><div class="nav-sec-h">Modules</div>${LESSONS.slice(1, 9).map(l => navItem(l, v.lesson, got)).join('')}</div>
+    <div class="nav-sec"><div class="nav-sec-h">Close</div>${LESSONS.slice(9).map(l => navItem(l, v.lesson, got)).join('')}</div>`;
+}
+
+function renderPage() {
+  const v = view.get(), l = lessonById(v.lesson), got = store.got();
+  const pr = progress(got, LESSONS);
+  document.getElementById('layer').textContent = `layer: ${l.layer}  ·  ${pr.done}/${pr.total} understood`;
+
+  let body = `<div class="kicker">${esc(l.layer === '—' ? 'Scaffold Lab' : l.layer + ' layer')}</div>
+    <h1>${esc(l.title)}</h1>
+    <div class="file" style="margin-top:9px">${esc(l.file)}</div>
+    <p class="metaphor">${esc(l.metaphor)}</p>
+    <p class="lead">${esc(l.lead)}</p>`;
+
+  if (l.id === 'overview') {
+    body += diagram(null) +
+      `<p>Click any box to jump to that module. Each one has a live demo — the demos are not
+      illustrations, they run the real mechanism.</p>
+      <h2>Why this file is the lesson</h2>
+      <p>This page is built the way it describes. It has a domain, a store with subscribe and
+      notify, an append-only journal, a pure derive layer, a view-state container, a hash router,
+      and a canon of pure string builders. Open the source and the layer comments are right there.</p>
+      <p>That means every demo below is the actual mechanism, not a mock-up of one. When the
+      journal refuses to delete, it refuses because of how it is written.</p>`;
+  } else if (l.id === 'rules') {
+    body += `<div class="gate"><h3>Dependencies point downward</h3>
+      <p>Domain knows nothing. Engine may use domain. Canon may use domain but never engine.
+      Shell may use all three. This is what lets you swap storage for a server without any view
+      noticing.</p></div>
+      <div class="gate" style="border-left-color:var(--neg)"><h3>Everything goes through the store</h3>
+      <p>The temptation is to save directly from a view because it is two lines instead of six.
+      Every architecture that rots, rots exactly there — slowly enough that you notice only once
+      it is expensive.</p></div>
+      <div class="gate"><h3>Corrections are additions</h3>
+      <p>Nothing recorded is rewritten or removed. If it changes, append the change and point at
+      what it replaces. You lose the ability to pretend you always thought the current thing,
+      which is the point.</p></div>
+      <h2>A rule nobody checks is a suggestion</h2>
+      <p>All three are enforced somewhere: the first by the purity script, the second by there
+      being no other way to reach storage, the third by the journal having no delete function.
+      If an architectural rule matters, make something fail when it breaks.</p>`;
+  } else if (l.id === 'export') {
+    const pr2 = progress(got, LESSONS);
+    body += `<div class="lab"><div class="lab-h"><span class="t">Snapshot</span>
+      <span class="s">${pr2.done} of ${pr2.total} modules marked understood</span></div>
+      <div class="lab-b">
+        <div class="row">
+          <button class="btn btn--p" data-demo="copy">Copy JSON</button>
+          <button class="btn" data-demo="download">Download</button>
+        </div>
+        <pre id="json"></pre>
+        <p class="warnline">No browser storage — closing the tab discards everything. Copy before closing.</p>
+      </div></div>
+      <h2>Why there is no save button</h2>
+      <p>Storage is a decision with consequences: migrations, versioning, what happens when the
+      shape changes. A prototype that quietly adopts it has made that decision without noticing.
+      Exporting instead keeps the decision visible and hands you a file you can paste back into a
+      conversation.</p>`;
+  } else {
+    if (SNIPPETS[l.id]) body += `<pre><code>${SNIPPETS[l.id]}</code></pre>`;
+    if (DEMOS[l.id]) body += DEMOS[l.id]();
+    body += checksView(l.id, got[l.id]);
+    if (RESOURCES[l.id]) body += `<h2>Read further</h2><div class="links">${
+      RESOURCES[l.id].map(([t, u, d]) =>
+        `<div class="link"><a href="${u}" target="_blank" rel="noopener">${esc(t)}</a><p>${esc(d)}</p></div>`).join('')}</div>`;
+  }
+
+  document.getElementById('page').innerHTML = body;
+  paintDemo();
+  scrollTo({ top: 0, behavior: 'instant' });
+}
+
+function paintDemo() {
+  const v = view.get(), id = v.lesson;
+  const out = document.getElementById('demo-out');
+  if (out) out.innerHTML = logView(v.log);
+
+  if (id === 'store') {
+    const a = document.getElementById('p-listeners'), b = document.getElementById('p-fires');
+    if (a) a.textContent = String(store.listenerCount());
+    if (b) b.textContent = String(store.fireCount());
+  }
+  if (id === 'journal') {
+    const box = document.getElementById('j-list');
+    if (box) {
+      const j = store.journal(), dead = store.supersededIds();
+      box.innerHTML = j.length
+        ? j.map(e => entryView(e, dead.has(e.id))).join('')
+        : `<div class="empty" style="border:1px solid var(--faint);margin-top:12px">No decisions recorded yet.</div>`;
+    }
+  }
+  if (id === 'derive') {
+    const src = document.getElementById('derive-src');
+    if (src) src.innerHTML = deriveLines.map(esc).join('\n');
+  }
+  if (id === 'viewstate') {
+    const d = document.getElementById('p-dom'), p = document.getElementById('p-view');
+    if (d) d.textContent = v.demoName || '—';
+    if (p) p.textContent = v.panelOpen ? 'open' : 'closed';
+  }
+  if (id === 'router') {
+    const r = router.parse();
+    const a = document.getElementById('p-path'), b = document.getElementById('p-params');
+    if (a) a.textContent = '/' + r.path.join('/');
+    if (b) b.textContent = Object.keys(r.params).length ? JSON.stringify(r.params) : '—';
+  }
+  if (id === 'canon') {
+    const i = document.getElementById('uname');
+    if (i) i.value = v.demoName || '';
+    paintCanon();
+  }
+  if (id === 'export') paintJson();
+
+  document.querySelectorAll('[data-check]').forEach(c => {
+    c.addEventListener('change', () => {});
+  });
+}
+
+function paintCanon() {
+  const raw = view.get().demoName || '';
+  const s = document.getElementById('p-safe'), r = document.getElementById('p-raw');
+  if (s) s.textContent = raw ? esc(raw) : '—';
+  if (r) r.innerHTML = raw ? raw.replace(/on\w+=/gi, 'on&#8203;$&') : '—';
+}
+
+function snapshot() {
+  const got = store.got(), pr = progress(got, LESSONS);
+  return {
+    instrument: 'scaffold-lab', exported: new Date().toISOString(),
+    progress: { understood: pr.done, of: pr.total },
+    modules: Object.keys(got),
+    journal: store.journal().map(e => ({ id: e.id, decision: e.decision, supersedes: e.supersedes || null }))
+  };
+}
+function paintJson() {
+  const el = document.getElementById('json');
+  if (el) el.textContent = JSON.stringify(snapshot(), null, 2);
+}
+
+/* ── shell: event binding. One delegated listener. ──────────── */
+
+document.addEventListener('click', e => {
+  const nav = e.target.closest('[data-nav]');
+  if (nav) { router.navigate([nav.dataset.nav]); return; }
+
+  const got = e.target.closest('[data-got]');
+  if (got && got.dataset.got) {
+    const id = got.dataset.got, now = !store.hasGot(id);
+    store.setGot(id, now);
+    store.append({ subjectId: id, decision: now ? 'Marked understood' : 'Unmarked', rationale: 'scaffold lab' });
+    renderNav(); renderPage(); return;
+  }
+
+  const d = e.target.closest('[data-demo]');
+  if (!d) return;
+  runDemo(d.dataset.demo);
+});
+
+document.addEventListener('input', e => {
+  if (e.target.id === 'uname') { view.set({ demoName: e.target.value }); paintCanon(); }
+});
+
+function runDemo(k) {
+  const L = (m, kind) => view.log(m, kind);
+  switch (k) {
+    case 'clear': view.clearLog(); deriveLines = ['export function score(list) {', '  return list.length * 3', '}']; break;
+
+    case 'mig-ok':
+      L('stored version: 0', ''); L('migration 1 add-influence — ok', 'ok');
+      L('migration 2 split-name — ok', 'ok'); L('migration 3 index-ids — ok', 'ok');
+      L('write version = 3', 'fire'); break;
+    case 'mig-fail':
+      L('stored version: 0', ''); L('migration 1 add-influence — ok', 'ok');
+      L('migration 2 split-name — threw', 'fail'); L('version NOT written — still 0', 'fail');
+      L('next load retries from 1. nothing half-applied.', ''); break;
+
+    case 'sub': store.subscribe(() => view.log('a view redrew', 'fire')); L('view subscribed', 'ok'); break;
+    case 'write': L('store.addItem() → write → notify()', ''); store.notify(); break;
+    case 'sneak': L('view wrote to storage directly', 'fail'); L('no notify() — every other view is now stale', 'fail'); break;
+
+    case 'j-add': {
+      const i = document.getElementById('dec');
+      const t = (i?.value || '').trim(); if (!t) { L('type a decision first', 'fail'); break; }
+      store.append({ subjectId: 'demo', decision: t, rationale: 'recorded in the lab' });
+      if (i) i.value = ''; break;
+    }
+    case 'j-supersede': {
+      const live = liveEntries(store.journal());
+      const last = live[live.length - 1];
+      if (!last) { L('record something first', 'fail'); break; }
+      store.supersede(last.id, { subjectId: 'demo', decision: last.decision + ' — revised', rationale: 'changed my mind' });
+      break;
+    }
+    case 'j-delete': L('there is no delete function. that is the design.', 'fail'); break;
+
+    case 'pure': deriveLines.splice(2, 0, '  const doubled = list.length * 2'); L('purity check passed', 'ok'); break;
+    case 'clock': deriveLines.splice(2, 0, '  const now = Date.now()');
+      L('purity check FAILED — derive.ts:3 reads the clock', 'fail'); L('build stopped', 'fail'); break;
+    case 'rand': deriveLines.splice(2, 0, '  const pick = Math.random()');
+      L('purity check FAILED — derive.ts:3 uses randomness', 'fail'); L('same input would give a different answer', 'fail'); break;
+    case 'ls': deriveLines.splice(2, 0, "  const raw = localStorage.getItem('x')");
+      L('purity check FAILED — derive.ts:3 touches storage', 'fail'); L('derive may only read its arguments', 'fail'); break;
+
+    case 'vs-dom': view.set({ demoName: 'Stakeholder ' + (store.journal().length + 1) });
+      store.notify(); break;
+    case 'vs-view': view.set({ panelOpen: !view.get().panelOpen }); break;
+
+    case 'r-focus': router.navigate(['router'], { focus: 's-14' }); return;
+    case 'r-clear': router.navigate(['router']); return;
+    case 'r-jump': router.navigate(['journal']); return;
+
+    case 'copy': navigator.clipboard?.writeText(JSON.stringify(snapshot(), null, 2)); break;
+    case 'download': {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([JSON.stringify(snapshot(), null, 2)], { type: 'application/json' }));
+      a.download = 'scaffold-lab.json'; a.click(); URL.revokeObjectURL(a.href); break;
+    }
+  }
+  paintDemo();
+}
+
+/* ── shell: wire router → view-state, then render. ──────────── */
+
+function syncFromUrl() {
+  const { path } = router.parse();
+  const id = path[0] && LESSONS.some(l => l.id === path[0]) ? path[0] : 'overview';
+  view.set({ lesson: id, log: [] });
+  document.getElementById('url').textContent = '#' + (location.hash.replace(/^#/, '') || '/');
+  renderNav(); renderPage();
+}
+
+store.subscribe(() => { renderNav(); });
+view.subscribe(() => {
+  document.getElementById('url').textContent = '#' + (location.hash.replace(/^#/, '') || '/');
+});
+router.onChange(syncFromUrl);
+syncFromUrl();
+</script>
+</body>
+</html>
