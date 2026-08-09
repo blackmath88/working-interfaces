@@ -16,7 +16,7 @@ const knowledgeKind = z.enum([
   'pattern',
   'doctrine',
   'foundation',
-  'motion',
+  'style',
 ]);
 
 const patterns = defineCollection({
@@ -40,17 +40,10 @@ const patterns = defineCollection({
   }),
 });
 
-const token = z.union([
-  z.object({
-    light: z.string().regex(/^oklch\(.+\)$/),
-    note: z.string().min(1),
-  }),
-  z.object({
-    value: z.string().min(1),
-    range: z.string().optional(),
-    note: z.string().optional(),
-  }),
-]);
+const foundationToken = z.object({
+  note: z.string().min(1),
+  range: z.string().optional(),
+});
 
 const foundations = defineCollection({
   loader: glob({
@@ -64,9 +57,26 @@ const foundations = defineCollection({
     kind: knowledgeKind,
     revision: z.number().int().positive(),
     summary: z.string().min(1),
-    tokens: z.record(z.string(), token),
+    tokens: z.record(z.string(), foundationToken),
     related: z.array(z.string()).default([]),
   }),
 });
 
-export const collections = { patterns, foundations };
+const styles = defineCollection({
+  loader: glob({
+    base: '../../knowledge/styles',
+    pattern: '*.md',
+  }),
+  schema: z.object({
+    id: z.string().min(1),
+    title: z.string().min(1),
+    status: knowledgeStatus,
+    kind: knowledgeKind,
+    revision: z.number().int().positive(),
+    summary: z.string().min(1),
+    selector: z.string().min(1),
+    tokens: z.record(z.string(), z.string().min(1)),
+  }),
+});
+
+export const collections = { patterns, foundations, styles };

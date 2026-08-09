@@ -1,0 +1,6 @@
+{
+  "files": [
+    "packages/scaffold/src/canon/format.ts",
+    "packages/scaffold/src/geometry/camera.ts"
+  ]
+}

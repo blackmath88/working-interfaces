@@ -8,9 +8,11 @@
   "scripts": {
     "dev": "npm --workspace @working-interfaces/field-manual run dev",
     "build": "npm --workspace @working-interfaces/field-manual run build",
+    "build:lab": "npm --prefix experiments/scaffold-lab run build",
     "check:links": "node scripts/check-links.mjs",
-    "test": "node --test tests/*.test.mjs",
-    "verify": "npm run build && npm run check:links",
+    "check:purity": "node scripts/check-purity.mjs",
+    "test": "node --test tests/*.test.mjs packages/scaffold/test/*.test.mjs",
+    "verify": "npm run build && npm run build:lab && npm run check:links && npm run check:purity && npm --workspace @working-interfaces/scaffold run check",
     "preview": "npm --workspace @working-interfaces/field-manual run preview",
     "deploy": "npm run build && npx wrangler@latest deploy"
   }

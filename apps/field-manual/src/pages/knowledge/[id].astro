@@ -6,15 +6,16 @@ export async function getStaticPaths() {
   const records = [
     ...await getCollection('patterns'),
     ...await getCollection('foundations'),
+    ...await getCollection('styles'),
   ];
   return records.map((record) => ({ params: { id: record.data.id }, props: { record } }));
 }
 
 const { record } = Astro.props;
 const { Content } = await render(record);
-const source = record.collection === 'foundations'
-  ? `/downloads/knowledge/foundations/${record.data.id}.md`
-  : `/downloads/knowledge/patterns/provenance/${record.data.id}.md`;
+const source = record.collection === 'patterns'
+  ? `/downloads/knowledge/patterns/${record.id}.md`
+  : `/downloads/knowledge/${record.collection}/${record.data.id}.md`;
 const tokens = 'tokens' in record.data ? Object.entries(record.data.tokens) : [];
 ---
 <BaseLayout title={`${record.data.title} · Working Interfaces`} description={record.data.summary}>
@@ -34,12 +35,13 @@ const tokens = 'tokens' in record.data ? Object.entries(record.data.tokens) : []
     <section class="token-grid" aria-label={`${record.data.title} tokens`}>
       {tokens.map(([name, token]) => (
         <article class="token-card">
-          {'light' in token && <span class="token-swatch" style={`--swatch: ${token.light}`} aria-hidden="true"></span>}
+          {typeof token === 'string' && token.startsWith('oklch(') && (
+            <span class="token-swatch" style={`--swatch: ${token}`} aria-hidden="true"></span>
+          )}
           <div>
             <h2>{name}</h2>
-            <code>{'light' in token ? token.light : token.value}</code>
-            {'note' in token && token.note && <p>{token.note}</p>}
-            {'range' in token && token.range && <p>Range: {token.range}</p>}
+            {typeof token === 'string' ? <code>{token}</code> : <p>{token.note}</p>}
+            {typeof token !== 'string' && token.range && <p>Range: {token.range}</p>}
           </div>
         </article>
       ))}

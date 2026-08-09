@@ -6,17 +6,17 @@ status: experiment
 revision: 1
 summary: Semantic-only colour. Roles are named by meaning; no token names a hue.
 tokens:
-  surface.canvas:      { light: "oklch(0.949 0.011 89.724)", note: "page background" }
-  surface.paper:       { light: "oklch(0.994 0.008 91.480)", note: "primary work plane" }
-  surface.sunken:      { light: "oklch(0.934 0.008 91.486)", note: "secondary or recessed plane" }
-  text.primary:        { light: "oklch(0.213 0.008 264.379)", note: "decision-relevant content" }
-  text.muted:          { light: "oklch(0.520 0.015 262.339)", note: "metadata and secondary explanation" }
-  border.structural:   { light: "oklch(0.837 0.015 84.587)", note: "planes, tables, persistent divisions" }
-  focus.primary:       { light: "oklch(0.556 0.209 279.984)", note: "keyboard and active selection" }
-  state.settled:       { light: "oklch(0.517 0.100 166.262)", note: "validated, agreed, or complete" }
-  state.uncertain:     { light: "oklch(0.558 0.116 74.727)", note: "assumed, provisional, unresolved" }
-  state.blocked:       { light: "oklch(0.533 0.153 28.230)", note: "No-Go, blocked, or closed gate" }
-  track.primary:       { light: "oklch(0.510 0.121 254.290)", note: "domain or method track identity" }
+  surface.canvas:      { note: "page background" }
+  surface.paper:       { note: "primary work plane" }
+  surface.sunken:      { note: "secondary or recessed plane" }
+  text.primary:        { note: "decision-relevant content" }
+  text.muted:          { note: "metadata and secondary explanation" }
+  border.structural:   { note: "planes, tables, persistent divisions" }
+  focus.primary:       { note: "keyboard and active selection" }
+  state.settled:       { note: "validated, agreed, or complete" }
+  state.uncertain:     { note: "assumed, provisional, unresolved" }
+  state.blocked:       { note: "No-Go, blocked, or closed gate" }
+  track.primary:       { note: "domain or method track identity" }
 related: []
 ---
 
